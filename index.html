@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lunar 100 관측 트래커 (PC/모바일 최적화)</title>
+    <title>Lunar 100 관측 트래커 (마커 디자인 개편)</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,6 +15,7 @@
         body, html {
             margin: 0;
             padding: 0;
+            width: 100%;
             height: 100%;
             background-color: #020617;
             overflow: hidden; 
@@ -65,47 +66,97 @@
         .modal-hidden { transform: translateX(100%); }
         .modal-visible { transform: translateX(0); }
 
-        /* 강조 효과 CSS (Ring & Label) */
-        .active-highlight-container {
-            pointer-events: none;
+        /* =========================================
+           새로운 지도 마커(HTML Element) CSS 스타일 
+           ========================================= */
+        .marker-container {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
             position: relative;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: z-index 0.2s;
         }
+        .marker-container:hover {
+            z-index: 999;
+        }
+        .marker-badge {
+            width: 28px;
+            height: 28px;
+            background-color: #1e293b; /* 어두운 남색 배경 */
+            border: 2px solid #cbd5e1; /* 밝은 회색 테두리 */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 11px;
+            font-family: 'Arial Black', sans-serif;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.7);
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        .marker-container:hover .marker-badge {
+            transform: scale(1.15);
+            border-color: #60a5fa;
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.6);
+        }
+        .marker-badge.completed {
+            background-color: #064e3b; /* 관측 완료 시 진한 녹색 */
+            border-color: #34d399; /* 밝은 녹색 테두리 */
+            color: #ecfdf5;
+        }
+        .marker-badge.active {
+            background-color: #1e3a8a; /* 선택 시 진한 파란색 */
+            border-color: #60a5fa;
+            transform: scale(1.2);
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.8);
+        }
+        .marker-label {
+            margin-top: 3px;
+            color: #f8fafc;
+            font-size: 12px;
+            font-style: italic;
+            font-family: Georgia, 'Times New Roman', serif; /* 클래식한 세리프 폰트 */
+            text-shadow: 
+                -1px -1px 0 #000,  
+                 1px -1px 0 #000,
+                -1px  1px 0 #000,
+                 1px  1px 0 #000,
+                 0px  3px 5px rgba(0,0,0,0.9); /* 강한 가독성을 위한 아웃라인과 그림자 */
+            text-align: center;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 10;
+            transition: transform 0.2s ease;
+        }
+        .marker-container:hover .marker-label {
+            transform: scale(1.1);
+        }
+
+        /* 지형 크기 비례 파란색 강조 링 */
         .active-ring {
-            border: 4px solid #60a5fa;
+            border: 3px solid rgba(96, 165, 250, 0.7);
             border-radius: 50%;
             position: absolute;
-            animation: pulse-ring 1.5s infinite ease-out;
-            box-shadow: 0 0 25px #3b82f6, inset 0 0 15px #3b82f6;
-        }
-        .active-name-label {
-            position: absolute;
-            white-space: nowrap;
-            background: rgba(15, 23, 42, 0.95);
-            color: #fff;
-            padding: 8px 14px;
-            border-radius: 8px;
-            border: 2px solid #60a5fa;
-            font-weight: 800;
-            font-size: 16px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.8);
-            animation: fade-in-label 0.4s ease-out;
-            z-index: 50;
+            top: 14px; /* 마커 배지의 정중앙 (28px / 2) */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse-ring 2s infinite ease-out;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.5), inset 0 0 15px rgba(59, 130, 246, 0.3);
+            pointer-events: none;
+            z-index: 1;
         }
 
         @keyframes pulse-ring {
-            0% { transform: scale(0.6); opacity: 1; }
-            100% { transform: scale(1.4); opacity: 0; }
-        }
-        @keyframes fade-in-label {
-            0% { opacity: 0; transform: translateX(-20px); }
-            100% { opacity: 1; transform: translateX(0); }
+            0% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
         }
     </style>
 </head>
-<body class="text-slate-200 flex flex-col h-screen relative font-sans">
+<body class="text-slate-200 flex flex-col h-screen w-screen overflow-hidden relative font-sans">
 
     <!-- 상단 헤더 -->
     <header class="bg-slate-900/90 backdrop-blur py-3 px-6 shadow-md border-b border-slate-800 shrink-0 z-20 flex flex-wrap justify-between items-center gap-4">
@@ -127,20 +178,20 @@
     </header>
 
     <!-- 메인 레이아웃 -->
-    <main class="flex-grow flex flex-col md:flex-row overflow-hidden relative">
+    <main class="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden relative w-full">
         <!-- 3D 달 영역 -->
-        <div id="globe-container" class="h-[45%] md:h-full md:w-[65%] relative z-0">
+        <div id="globe-container" class="w-full h-[45%] md:h-full md:w-[65%] flex-shrink-0 md:flex-shrink relative z-0">
             <div id="globeViz" class="absolute inset-0"></div>
             <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end pointer-events-none z-10">
                 <div class="text-[10px] md:text-xs text-slate-300 bg-slate-900/80 p-2 rounded backdrop-blur border border-slate-700 shadow-lg">
-                    <span class="inline-block w-2 h-2 rounded-full bg-[#fb923c] mr-1"></span> 관측 전 
-                    <span class="inline-block w-2 h-2 rounded-full bg-[#4ade80] ml-3 mr-1"></span> 관측 완료
+                    <span class="inline-block w-2 h-2 rounded-full border-2 border-slate-400 bg-slate-800 mr-1"></span> 관측 전 
+                    <span class="inline-block w-2 h-2 rounded-full border-2 border-emerald-400 bg-emerald-800 ml-2 mr-1"></span> 관측 완료
                 </div>
             </div>
         </div>
 
         <!-- 우측 사이드 패널 -->
-        <div id="side-panel" class="h-[55%] md:h-full md:w-[35%] bg-slate-900 border-t md:border-t-0 md:border-l border-slate-800 relative overflow-hidden z-10 flex flex-col shadow-2xl">
+        <div id="side-panel" class="w-full h-[55%] md:h-full md:w-[35%] bg-slate-900 border-t md:border-t-0 md:border-l border-slate-800 relative overflow-hidden z-10 flex flex-col shadow-2xl">
             <!-- 목록 화면 -->
             <div id="list-view" class="w-full h-full overflow-y-auto scroll-smooth flex flex-col">
                 <div class="sticky top-0 bg-slate-900/95 backdrop-blur py-3 px-4 border-b border-slate-800 flex justify-between items-end z-10">
@@ -152,22 +203,20 @@
                         </div>
                     </div>
                 </div>
-                <div id="lunar-list" class="p-3 space-y-2 pb-12 font-sans">
-                    <!-- 리스트 아이템이 렌더링될 위치 -->
-                </div>
+                <div id="lunar-list" class="p-3 space-y-2 pb-10"></div>
             </div>
 
-            <!-- 상세 정보 화면 (슬라이드 오버레이) -->
+            <!-- 상세 정보 화면 -->
             <div id="detail-modal" class="absolute inset-0 bg-slate-900 z-20 hidden flex-col modal-hidden">
                 <div class="flex justify-between items-center p-4 border-b border-slate-800 bg-slate-800/50 shrink-0">
-                    <h3 id="modal-title" class="text-base md:text-lg font-bold text-blue-400 truncate pr-2 leading-tight"></h3>
-                    <button onclick="closeModal()" class="text-slate-300 hover:text-white flex items-center gap-1 text-sm bg-slate-700/50 px-4 py-2 rounded-full transition-colors whitespace-nowrap font-bold">
+                    <h3 id="modal-title" class="text-base md:text-lg font-bold text-blue-400 truncate pr-2"></h3>
+                    <button onclick="closeModal()" class="text-slate-300 hover:text-white flex items-center gap-1 text-sm bg-slate-700/50 px-3 py-1.5 rounded transition-colors whitespace-nowrap font-bold">
                         <span>◀</span> 목록으로
                     </button>
                 </div>
-                <div class="p-6 overflow-y-auto flex-grow pb-10">
-                    <div id="modal-best-day" class="mb-4 text-xs font-bold px-3 py-3 rounded-lg bg-blue-900/30 border border-blue-500/30 text-blue-300 flex items-center justify-between font-mono">
-                        <span>📅 관측 최적기:</span>
+                <div class="p-5 overflow-y-auto flex-grow pb-10 font-sans">
+                    <div id="modal-best-day" class="mb-4 text-xs font-bold px-3 py-2 rounded-lg bg-blue-900/30 border border-blue-500/30 text-blue-300 flex items-center gap-2 font-mono">
+                        <span>📅 관측 권장 시기:</span>
                         <span id="modal-best-day-value"></span>
                     </div>
                     
@@ -196,29 +245,29 @@
 
         // PDF 기반 1~100번 전체 실제 지형 데이터
         const lunar100Data = [
-            { id: 1, name: "달", eng: "Moon", desc: "지구의 거대한 위성입니다. 전체적인 모습과 밝은 고지대, 어두운 바다의 대비를 관찰하세요.", lat: null, lng: null, day: 14, diam: 3476 },
-            { id: 2, name: "지구조", eng: "Earthshine", desc: "지구에서 두 번 반사된 태양빛이 달의 어두운 부분을 희미하게 비추는 현상입니다.", lat: null, lng: null, day: 2, diam: 3476 },
-            { id: 3, name: "바다/고지대 경계", eng: "Mare/highland dichotomy", desc: "성분이 뚜렷하게 다른 어두운 현무암 바다와 밝은 사장암 고지대의 극명한 대비입니다.", lat: null, lng: null, day: 14, diam: 3476 },
+            { id: 1, name: "달", eng: "Moon", desc: "지구의 거대한 위성입니다. 맨눈으로도 보이는 고지대(밝은 부분)와 바다(어두운 부분)의 전체적인 대조를 관찰하세요.", lat: null, lng: null, day: 14, diam: 3476 },
+            { id: 2, name: "지구조", eng: "Earthshine", desc: "지구에서 두 번 반사된 태양빛이 달의 어두운 부분을 희미하게 비추는 현상입니다. '그믐달 속 보름달'처럼 보입니다.", lat: null, lng: null, day: 2, diam: 3476 },
+            { id: 3, name: "바다/고지대 경계", eng: "Mare/highland dichotomy", desc: "달의 앞면은 어두운 현무암질 바다와 밝은 사장암질 고지대로 뚜렷하게 나뉩니다. 두 지각의 성분 차이를 이해하는 열쇠입니다.", lat: null, lng: null, day: 14, diam: 3476 },
             { id: 4, name: "아펜니노 산맥", eng: "Apennines", desc: "비의 바다(Mare Imbrium) 분지 테두리를 형성하는 장엄한 산맥입니다. 최고 높이는 약 5km에 달합니다.", lat: "18.9N", lng: "3.7W", day: 7, diam: 400 },
-            { id: 5, name: "코페르니쿠스", eng: "Copernicus", desc: "전형적인 대형 복합 크레이터입니다. 화려한 계단식 내벽과 거대한 방사형 광조가 특징입니다.", lat: "9.7N", lng: "20.1W", day: 9, diam: 93 },
-            { id: 6, name: "티코", eng: "Tycho", desc: "매우 젊고 밝은 크레이터로, 달 전체로 뻗어 나가는 약 1,500km 길이의 광조 시스템을 가지고 있습니다.", lat: "43.4S", lng: "11.1W", day: 9, diam: 102 },
-            { id: 7, name: "알타이 절벽", eng: "Altai Scarp", desc: "감로주의 바다(Mare Nectaris) 충돌 분지의 고리 흔적으로 만들어진 거대 절벽 지형입니다.", lat: "24.3S", lng: "22.6E", day: 5, diam: 425 },
-            { id: 8, name: "테오필루스 삼총사", eng: "Theophilus, Cyrillus, Catharina", desc: "나란히 배열된 세 크레이터로, 북쪽에서 남쪽으로 갈수록 노화되는 크레이터 풍화 단계를 보여줍니다.", lat: "13.2S", lng: "24.0E", day: 5, diam: 110 },
+            { id: 5, name: "코페르니쿠스", eng: "Copernicus", desc: "전형적인 대형 복합 크레이터입니다. 계단식 내벽, 중앙 봉우리, 그리고 주변으로 길게 뻗은 화려한 광조(Ray)가 특징입니다.", lat: "9.7N", lng: "20.1W", day: 9, diam: 93 },
+            { id: 6, name: "티코", eng: "Tycho", desc: "달 남부 고지대의 젊고 밝은 크레이터입니다. 보름달 때 달 전체를 가로지르는 거대한 광조 시스템의 중심입니다.", lat: "43.4S", lng: "11.1W", day: 9, diam: 102 },
+            { id: 7, name: "알타이 절벽", eng: "Altai Scarp", desc: "감로주의 바다(Mare Nectaris) 충돌 분지의 다중 고리 중 하나로, 거대한 단층 절벽 지형입니다.", lat: "24.3S", lng: "22.6E", day: 5, diam: 425 },
+            { id: 8, name: "테오필루스 삼총사", eng: "Theophilus, Cyrillus, Catharina", desc: "나란히 배열된 세 크레이터입니다. 북쪽에서 남쪽으로 갈수록 노화되는 크레이터 풍화 단계를 보여줍니다.", lat: "13.2S", lng: "24.0E", day: 5, diam: 110 },
             { id: 9, name: "클라비우스", eng: "Clavius", desc: "남부 고지대의 거대 크레이터입니다. 내부에 아치형으로 배열된 소크레이터 체인이 인상적입니다.", lat: "58.8S", lng: "14.1W", day: 9, diam: 225 },
-            { id: 10, name: "위기의 바다", eng: "Mare Crisium", desc: "독립된 원형 분지에 담긴 바다입니다. 해 뜰 무렵 내부에 형성된 주름 능선들이 아름답게 관찰됩니다.", lat: "18.0N", lng: "59.0E", day: 2, diam: 540 },
+            { id: 10, name: "위기의 바다", eng: "Mare Crisium", desc: "독립된 원형 분지에 담긴 바다입니다. 해 뜰 무렵 내부에 형성된 주름 능선(Dorsum)들이 아름답게 관찰됩니다.", lat: "18.0N", lng: "59.0E", day: 2, diam: 540 },
             { id: 11, name: "아리스타르쿠스", eng: "Aristarchus", desc: "달에서 가장 반사율이 높은(밝은) 지형입니다. 내벽에 어두운 띠와 인근 슈뢰터 계곡을 함께 관찰하세요.", lat: "23.7N", lng: "47.4W", day: 11, diam: 40 },
-            { id: 12, name: "프로클루스", eng: "Proclus", desc: "비스듬한 충돌로 인해 광조가 한쪽(팔루스 솜니 쪽)을 제외하고 부채꼴 모양으로 펼쳐진 독특한 크레이터입니다.", lat: "16.1N", lng: "46.8E", day: 4, diam: 28 },
-            { id: 13, name: "가상디", eng: "Gassendi", desc: "습기의 바다 가장자리에 위치한 지면 파쇄 크레이터(FFC)입니다. 용암 융기로 인해 바닥이 갈라진 틈을 확인하세요.", lat: "17.6S", lng: "40.1W", day: 10, diam: 101 },
-            { id: 14, name: "무지개 만", eng: "Sinus Iridum", desc: "거대한 크레이터가 절반 정도 용암에 잠겨 형성된 아름다운 반원형 만입니다. 라플라스 곶이 유명합니다.", lat: "45.0N", lng: "32.0W", day: 9, diam: 260 },
+            { id: 12, name: "프로클루스", eng: "Proclus", desc: "비스듬한 충돌로 인해 광조가 한쪽 방향을 제외하고 부채꼴 모양으로 펼쳐진 독특한 크레이터입니다.", lat: "16.1N", lng: "46.8E", day: 4, diam: 28 },
+            { id: 13, name: "가상디", eng: "Gassendi", desc: "습기의 바다 가장자리에 위치한 지면 파쇄 크레이터(FFC)입니다. 용암 융기로 인해 바닥이 갈라진 미세한 틈들을 관찰하세요.", lat: "17.6S", lng: "40.1W", day: 10, diam: 101 },
+            { id: 14, name: "무지개 만", eng: "Sinus Iridum", desc: "비의 바다 분지 가장자리의 거대 크레이터가 용암에 절반 잠겨 형성된 아름다운 반원형 만입니다. 라플라스 곶이 유명합니다.", lat: "45.0N", lng: "32.0W", day: 9, diam: 260 },
             { id: 15, name: "직선 벼랑", eng: "Straight Wall", desc: "길이 110km의 수직 단층입니다. 해가 뜰 때와 질 때 명암을 통해 입체적으로 보입니다.", lat: "21.8S", lng: "7.8W", day: 8, diam: 130 },
-            { id: 16, name: "페타비우스", eng: "Petavius", desc: "바닥에 중앙 봉우리에서 뻗은 거대한 균열 계곡(Rimae Petavius)이 특징인 매우 역동적인 대형 크레이터입니다.", lat: "25.1S", lng: "60.4E", day: 2, diam: 177 },
-            { id: 17, name: "슈뢰터 계곡", eng: "Schröter's Valley", desc: "달에서 가장 크고 긴 사행성(구불구불한) 용암 계곡입니다. 과거 달의 강력했던 화산 활동의 증거입니다.", lat: "26.2N", lng: "50.8W", day: 11, diam: 168 },
-            { id: 18, name: "맑음의 바다 어두운 테두리", eng: "Mare Serenitatis dark edges", desc: "티타늄 함량이 높아 푸르고 어두운 빛을 띠는 고대의 용암 지대입니다.", lat: "17.8N", lng: "23.0E", day: 5, diam: 300 },
-            { id: 19, name: "알프스 계곡", eng: "Alpine Valley", desc: "알프스 산맥을 직선으로 가로지르는 166km 길이의 거대 지구대(Graben)입니다.", lat: "49.0N", lng: "3.0E", day: 7, diam: 165 },
+            { id: 16, name: "페타비우스", eng: "Petavius", desc: "바닥에 중앙 봉우리에서 뻗은 거대한 균열 계곡(Rimae Petavius)이 특징인 매우 역동적인 모습의 대형 크레이터입니다.", lat: "25.1S", lng: "60.4E", day: 2, diam: 177 },
+            { id: 17, name: "슈뢰터 계곡", eng: "Schröter's Valley", desc: "달에서 가장 크고 긴 사행성(구불구불한) 용암 계곡입니다. 과거 달의 강력했던 화산 활동 증거입니다.", lat: "26.2N", lng: "50.8W", day: 11, diam: 168 },
+            { id: 18, name: "맑음의 바다 어두운 테두리", eng: "Mare Serenitatis dark edges", desc: "티타늄 함량이 높아 푸르고 어두운 빛을 띠는 고대 용암 지대입니다. 바다 형성 시기의 성분 차이를 보여줍니다.", lat: "17.8N", lng: "23.0E", day: 5, diam: 300 },
+            { id: 19, name: "알프스 계곡", eng: "Alpine Valley", desc: "알프스 산맥을 직선으로 가로지르는 166km 길이의 거대 지구대(Graben)입니다. 중앙의 미세한 계곡을 찾아보세요.", lat: "49.0N", lng: "3.0E", day: 7, diam: 165 },
             { id: 20, name: "포시도니우스", eng: "Posidonius", desc: "바닥이 용암에 의해 융기되어 복잡한 능선과 계곡이 어우러진 대표적인 지면 파쇄 크레이터입니다.", lat: "31.8N", lng: "29.9E", day: 5, diam: 95 },
-            { id: 21, name: "프라카스토리우스", eng: "Fracastorius", desc: "바닥이 용암에 의해 내려앉고 한쪽 벽이 무너진 오래된 크레이터입니다.", lat: "21.5S", lng: "33.2E", day: 5, diam: 124 },
-            { id: 22, name: "아리스타르쿠스 고원", eng: "Aristarchus Plateau", desc: "화쇄암 물질로 덮인 미스터리한 사각형 모양의 융기 지역입니다.", lat: "26.0N", lng: "51.0W", day: 11, diam: 200 },
-            { id: 23, name: "피코 산", eng: "Pico", desc: "비의 바다 한가운데 고립되어 솟아 있는 거대 산 봉우리입니다. 높이 약 2.4km.", lat: "45.7N", lng: "8.9W", day: 7, diam: 25 },
+            { id: 21, name: "프라카스토리우스", eng: "Fracastorius", desc: "감로주의 바다 용암에 의해 바닥이 내려앉고 한쪽 벽이 무너진 오래된 크레이터입니다.", lat: "21.5S", lng: "33.2E", day: 5, diam: 124 },
+            { id: 22, name: "아리스타르쿠스 고원", eng: "Aristarchus Plateau", desc: "화쇄암 물질로 덮인 미스터리한 사각형 모양의 융기 지역입니다. 주변 고지대와 색상이 다릅니다.", lat: "26.0N", lng: "51.0W", day: 11, diam: 200 },
+            { id: 23, name: "피코 산", eng: "Pico", desc: "비의 바다 한가운데 고립되어 솟아 있는 거대 산 봉우리입니다. 분지 내부 고리의 파편입니다.", lat: "45.7N", lng: "8.9W", day: 7, diam: 25 },
             { id: 24, name: "히기누스 계곡", eng: "Hyginus Rille", desc: "화산 폭발이나 붕괴로 인해 형성된 구덩이들이 사슬처럼 이어진 독특한 화산성 계곡 지형입니다.", lat: "7.4N", lng: "7.8E", day: 6, diam: 220 },
             { id: 25, name: "메시에 & 메시에 A", eng: "Messier & Messier A", desc: "비스듬한 충돌로 생성된 혜성 꼬리 같은 광조를 가진 특이한 크레이터 쌍입니다.", lat: "1.9S", lng: "47.6E", day: 4, diam: 15 },
             { id: 26, name: "추위의 바다", eng: "Mare Frigoris", desc: "달 북극 근처의 가늘고 긴 바다입니다. 형성 원인에 대한 다양한 지질학적 가설이 존재합니다.", lat: "56.0N", lng: "1.4E", day: 5, diam: 1590 },
@@ -231,10 +280,10 @@
             { id: 33, name: "뱀 등성이", eng: "Serpentine Ridge", desc: "맑음의 바다를 가로지르는 거대한 주름 능선입니다. 용암 수축의 흔적입니다.", lat: "27.3N", lng: "25.3E", day: 5, diam: 150 },
             { id: 34, name: "죽음의 호수", eng: "Lacus Mortis", desc: "크레이터 내부에 계곡과 능선이 함께 존재하는 특이한 고지대 지형입니다.", lat: "45.0N", lng: "27.2E", day: 5, diam: 151 },
             { id: 35, name: "트리스네커 계곡", eng: "Triesnecker Rilles", desc: "복잡하게 얽힌 거미줄 모양의 화산성 계곡 무리입니다.", lat: "4.3N", lng: "4.6E", day: 6, diam: 200 },
-            { id: 36, name: "그리말디 분지", eng: "Grimaldi basin", desc: "달 앞면에서 가장 어둡게 보이는 지점 중 하나로 소규모 충돌 분지입니다.", lat: "5.5S", lng: "68.3W", day: 13, diam: 220 },
+            { id: 36, name: "그리말디 분지", eng: "Grimaldi basin", desc: "달 앞면에서 가장 어둡게 보이는 지점 중 하나로, 소규모 충돌 분지입니다.", lat: "5.5S", lng: "68.3W", day: 13, diam: 220 },
             { id: 37, name: "바이", eng: "Bailly", desc: "달 앞면 최대의 크레이터이나 가장자리에 있어 관측 조건이 중요합니다.", lat: "66.5S", lng: "69.1W", day: 12, diam: 303 },
-            { id: 38, name: "사빈 & 리터", eng: "Sabine & Ritter", desc: "크기와 모양이 비슷한 쌍둥이 크레이터입니다.", lat: "1.7N", lng: "19.7E", day: 5, diam: 30 },
-            { id: 39, name: "시카드", eng: "Schickard", desc: "거대한 크레이터 바닥이 용암으로 덮여 있으며 분출물 흔적이 관찰됩니다.", lat: "44.3S", lng: "55.3W", day: 11, diam: 227 },
+            { id: 38, name: "사빈 & 리터", eng: "Sabine & Ritter", desc: "크기와 모양이 비슷한 쌍둥이 크레이터입니다. 아폴로 11호 착륙지 근처입니다.", lat: "1.7N", lng: "19.7E", day: 5, diam: 30 },
+            { id: 39, name: "시카드", eng: "Schickard", desc: "거대한 크레이터 바닥이 용암으로 덮여 있으며, 주변 분지의 분출물 흔적이 관찰됩니다.", lat: "44.3S", lng: "55.3W", day: 11, diam: 227 },
             { id: 40, name: "얀센 계곡", eng: "Janssen Rille", desc: "고지대임에도 바닥에 굽이치는 계곡이 있는 드문 사례입니다.", lat: "45.4S", lng: "39.3E", day: 4, diam: 190 },
             { id: 41, name: "베셀 광조", eng: "Bessel ray", desc: "맑음의 바다를 가로지르지만 기원이 불분명한 긴 빛줄기입니다.", lat: "21.8N", lng: "17.9E", day: 6, diam: 15 },
             { id: 42, name: "마리우스 언덕", eng: "Marius Hills", desc: "수많은 작은 화산 돔과 구릉들이 밀집된 거대 화산 지대입니다.", lat: "12.5N", lng: "54.0W", day: 11, diam: 150 },
@@ -290,7 +339,7 @@
             { id: 92, name: "귈덴 계곡", eng: "Gylden Valley", desc: "충돌 파편들이 표면을 긁어 만든 방사형 조각 지형의 파편입니다.", lat: "5.1S", lng: "0.7E", day: 7, diam: 47 },
             { id: 93, name: "디오니시우스 광조", eng: "Dionysius rays", desc: "밝은 광조 사이에 어두운 물질이 섞인 특이한 광조입니다.", lat: "2.8N", lng: "17.3E", day: 6, diam: 18 },
             { id: 94, name: "드리갈스키", eng: "Drygalski", desc: "남극 가장자리의 거대 산맥처럼 보이는 대형 크레이터입니다.", lat: "79.3S", lng: "84.9W", day: 9, diam: 162 },
-            { id: 95, name: "폭풍의 대양", eng: "Procellarum basin", desc: "달에서 가장 거대한 충돌 분지 흔적입니다.", lat: "23.0N", lng: "15.0W", day: 14, diam: 3200 },
+            { id: 95, name: "폭풍의 대양", eng: "Procellarum basin", desc: "달에서 가장 거대한 충돌 분지 흔적으로 바다 전체를 포함합니다.", lat: "23.0N", lng: "15.0W", day: 14, diam: 3200 },
             { id: 96, name: "라이프니츠 산맥", eng: "Leibnitz Mountains", desc: "남극-에이트켄 분지의 테두리 융기부로 남극 실루엣을 만듭니다.", lat: "85.0S", lng: "30.0E", day: 8, diam: 100 },
             { id: 97, name: "인기라미 계곡", eng: "Inghirami Valley", desc: "동쪽의 바다 형성 시 만들어진 방사형 계곡 지형입니다.", lat: "44.0S", lng: "73.0W", day: 13, diam: 140 },
             { id: 98, name: "비의 바다 용암류", eng: "Imbrium lava flows", desc: "서로 다른 시기에 분출된 용암 경계인 낮은 턱 지형입니다.", lat: "32.8N", lng: "22.0W", day: 10, diam: 100 },
@@ -309,51 +358,69 @@
             .filter(d => d.lat !== null)
             .map(d => ({ ...d, latNum: parseCoord(d.lat), lngNum: parseCoord(d.lng) }));
 
-        const STORAGE_KEY = 'lunar100_final_standard_v5';
+        const STORAGE_KEY = 'lunar100_v14_badge_design';
         let progress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
-        let moonGlobe; // 전역 스코프로 맵 객체 관리
+        let moonGlobe;
 
-        // 안전한 초기화: DOMContentLoaded 사용
         document.addEventListener('DOMContentLoaded', () => {
             const globeContainer = document.getElementById('globe-container');
             if (!globeContainer) return;
 
+            const initWidth = globeContainer.clientWidth || window.innerWidth * 0.65;
+            const initHeight = globeContainer.clientHeight || window.innerHeight * 0.5;
+
             moonGlobe = Globe()(document.getElementById('globeViz'))
-                .width(globeContainer.clientWidth)
-                .height(globeContainer.clientHeight)
-                // 가장 안정적인 저해상도 표준 텍스처 사용
+                .width(initWidth)
+                .height(initHeight)
                 .globeImageUrl('https://unpkg.com/three-globe/example/img/moon-surface.jpg')
                 .bumpImageUrl('https://unpkg.com/three-globe/example/img/moon-surface.jpg')
                 .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
                 .showAtmosphere(false)
-                .labelsData(globeData)
-                .labelLat('latNum')
-                .labelLng('lngNum')
-                .labelAltitude(0.005)
-                .labelText(d => d.id === activeId ? '' : `L${d.id}`)
-                .labelSize(d => d.id === activeId ? 0 : 2.3)
-                .labelDotRadius(d => d.id === activeId ? 0 : 1.1)
-                .labelColor(d => progress[d.id] ? '#4ade80' : '#fb923c') 
-                .labelResolution(3)
-                .onLabelClick(d => openModal(d.id))
-                .htmlElementsData([])
+                // 업로드된 이미지 스타일에 맞춰 모든 마커를 HTML로 렌더링
+                .htmlElementsData(globeData)
                 .htmlLat('latNum')
                 .htmlLng('lngNum')
                 .htmlElement(d => {
                     const el = document.createElement('div');
-                    el.className = 'active-highlight-container';
-                    // 지형 크기 비례 원형 강조 (최소 55px, 최대 320px)
-                    const ringSize = Math.min(320, Math.max(55, d.diam * 0.65));
-                    const labelPos = (ringSize / 2) + 15;
-                    el.innerHTML = `
-                        <div class="active-ring" style="width:${ringSize}px; height:${ringSize}px;"></div>
-                        <div class="active-name-label" style="left:${labelPos}px;">${d.name}</div>
-                    `;
+                    el.className = 'marker-container';
+                    
+                    const isCompleted = progress[d.id];
+                    const isActive = d.id === activeId;
+                    
+                    // 배지 (원형)
+                    const badge = document.createElement('div');
+                    badge.className = `marker-badge ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}`;
+                    badge.innerHTML = `L${d.id}`;
+                    
+                    // 라벨 (이탤릭 영문 텍스트)
+                    const label = document.createElement('div');
+                    label.className = 'marker-label';
+                    label.innerHTML = d.eng;
+                    
+                    el.appendChild(badge);
+                    el.appendChild(label);
+                    
+                    // 선택된 마커 파란색 링 강조
+                    if (isActive) {
+                        const ringSize = Math.min(320, Math.max(55, d.diam * 0.65));
+                        const ring = document.createElement('div');
+                        ring.className = 'active-ring';
+                        ring.style.width = `${ringSize}px`;
+                        ring.style.height = `${ringSize}px`;
+                        el.appendChild(ring);
+                        
+                        el.style.zIndex = "1000"; // 활성화 시 맨 위로
+                    }
+
+                    el.onclick = (e) => {
+                        e.stopPropagation();
+                        openModal(d.id);
+                    };
+                    
                     return el;
                 });
 
-            // PC 환경에서 화면 크기 변경 시에도 레이아웃이 깨지지 않도록 보장
             const resizeObserver = new ResizeObserver(() => {
                 if(globeContainer && moonGlobe) {
                     moonGlobe.width(globeContainer.clientWidth).height(globeContainer.clientHeight);
@@ -363,7 +430,6 @@
 
             updateMoonIcon(calculateMoonAge(new Date()));
             
-            // 지도 초기화 부드럽게 연출
             setTimeout(() => resetGlobeView(), 500);
             renderList();
         });
@@ -406,11 +472,10 @@
             activeId = id;
             
             if (item.lat && moonGlobe) {
-                const mapItem = globeData.find(d => d.id === id);
-                moonGlobe.htmlElementsData([mapItem]); 
-                moonGlobe.labelsData([...globeData]);  
+                // 활성 상태 변경을 위한 HTML 요소 데이터 갱신
+                moonGlobe.htmlElementsData([...globeData]);  
                 const alt = Math.max(0.12, Math.min(0.7, item.diam / 1000));
-                moonGlobe.pointOfView({ lat: mapItem.latNum, lng: mapItem.lngNum, altitude: alt }, 1200);
+                moonGlobe.pointOfView({ lat: parseCoord(item.lat), lng: parseCoord(item.lng), altitude: alt }, 1200);
             }
             
             const modal = document.getElementById('detail-modal');
@@ -433,7 +498,6 @@
             
             if(modal) {
                 modal.classList.remove('hidden');
-                // 약간의 딜레이를 주어 애니메이션 적용
                 setTimeout(() => {
                     modal.classList.remove('modal-hidden');
                     modal.classList.add('modal-visible');
@@ -444,8 +508,7 @@
         window.closeModal = function() {
             activeId = null;
             if (moonGlobe) {
-                moonGlobe.htmlElementsData([]);
-                moonGlobe.labelsData([...globeData]);
+                moonGlobe.htmlElementsData([...globeData]); // 상태 복구를 위한 데이터 갱신
             }
             resetGlobeView();
             
@@ -461,7 +524,9 @@
             event.stopPropagation(); 
             progress[id] = !progress[id];
             localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-            if (moonGlobe) moonGlobe.labelsData([...globeData]); 
+            if (moonGlobe) {
+                moonGlobe.htmlElementsData([...globeData]); // 체크 상태 변경에 따른 마커 색상 갱신
+            }
             renderList();
         };
 
@@ -488,8 +553,8 @@
                         <div class="flex-grow overflow-hidden">
                             <div class="flex justify-between items-start">
                                 <div class="flex flex-col">
-                                    <h3 class="text-sm ${titleClass} truncate group-hover:text-blue-400">
-                                        <span class="text-blue-500/80 mr-2 font-mono text-xs">L${item.id}</span>${item.name} (${item.eng})
+                                    <h3 class="text-sm ${titleClass} truncate group-hover:text-blue-400 transition-colors">
+                                        <span class="text-blue-500/80 mr-2 font-mono text-xs">L${item.id}</span>${item.name} <span class="text-xs font-normal">(${item.eng})</span>
                                     </h3>
                                     <p class="text-[11px] leading-tight text-slate-400 mt-1.5 line-clamp-1 opacity-60 group-hover:opacity-100">${item.desc}</p>
                                 </div>
@@ -508,7 +573,6 @@
                 progressText.innerText = `${completedCount} / 100`;
             }
             if (progressBar) {
-                // 안전한 속성 제어로 에러 원천 차단
                 progressBar.style.setProperty('width', `${completedCount}%`);
             }
         }

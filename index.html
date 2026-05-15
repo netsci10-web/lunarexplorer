@@ -148,9 +148,6 @@
         }
         
         .cesium-viewer-bottom, .cesium-viewer-toolbar, .cesium-viewer-animationContainer, .cesium-viewer-timelineContainer { display: none !important; }
-
-        /* Scale Control Dark Theme */
-        .leaflet-control-scale-line { background: rgba(15, 23, 42, 0.7) !important; color: #f8fafc !important; border-color: #94a3b8 !important; text-shadow: none !important; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; }
     </style>
 </head>
 <body>
@@ -179,13 +176,6 @@
             <div id="leaflet-map"></div>
             <div id="cesium-container"></div>
             
-            <!-- 하단 확대/축척(고도) 정보 인디케이터 -->
-            <div id="scale-info" style="position: absolute; bottom: 20px; left: 20px; z-index: 2000; background: rgba(15, 23, 42, 0.85); color: #e2e8f0; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; border: 1px solid #334155; backdrop-filter: blur(4px); box-shadow: 0 4px 6px rgba(0,0,0,0.5); display: flex; gap: 12px; align-items: center; pointer-events: none;">
-                <div>관측 고도: <span id="scale-alt" style="font-weight: 700; color: #3b82f6;">-</span></div>
-                <div style="width: 1px; height: 12px; background: #475569;"></div>
-                <div>줌 레벨: <span id="scale-zoom" style="font-weight: 700; color: #3b82f6;">-</span></div>
-            </div>
-
             <div id="loading">
                 <div class="spinner"></div>
                 <div class="text-sm tracking-widest text-slate-400 font-bold">NASA LRO DATA LOADING...</div>
@@ -506,21 +496,18 @@
         let cesiumMarkers = [];
 
         function initMap() {
-            // --- 2D Map (확대 수준을 12로 상향, 20km 이하로 더 깊이 관찰 가능하도록 설정) ---
+            // --- 2D Map (확대 수준을 8.1로 제한) ---
             const nasaTrekUrl = 'https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/{z}/{y}/{x}.jpg';
             map2D = L.map('leaflet-map', { 
                 center: [0, 0], 
                 zoom: 2, 
                 minZoom: 1, 
-                maxZoom: 12, 
+                maxZoom: 8.1, 
                 crs: L.CRS.EPSG4326, 
                 zoomSnap: 0.1, 
                 zoomDelta: 0.5 
             });
-            // maxNativeZoom을 10으로 주어 10 이상의 줌에서는 타일을 끊김 없이 자체 확대(스트레칭)하도록 처리
-            L.tileLayer(nasaTrekUrl, { attribution: 'NASA Moon Trek', noWrap: true, maxNativeZoom: 10, maxZoom: 12 }).addTo(map2D);
-            // 우측 하단에 물리적 거리 척도 바 표시
-            L.control.scale({ imperial: false, position: 'bottomright' }).addTo(map2D);
+            L.tileLayer(nasaTrekUrl, { attribution: 'NASA Moon Trek', noWrap: true, maxZoom: 8.1 }).addTo(map2D);
 
             // --- 3D Globe ---
             try {
@@ -532,14 +519,14 @@
                     terrainProvider: moonTerrain,
                     imageryProvider: new Cesium.UrlTemplateImageryProvider({
                         url: nasaTrekUrl, tms: false, 
-                        maximumLevel: 10,
+                        maximumLevel: 8,
                         tilingScheme: new Cesium.GeographicTilingScheme({ ellipsoid: Cesium.Ellipsoid.MOON })
                     })
                 });
                 map3D.scene.skyBox.show = false;
                 map3D.scene.backgroundColor = Cesium.Color.BLACK;
-                map3D.camera.percentageChanged = 0.02; // 3D 성능 및 업데이트 감도 최적화
-                map3D.scene.screenSpaceCameraController.minimumZoomDistance = 15000; // 카메라가 달 표면 15km 고도까지 극접근 가능하도록 설정
+                map3D.camera.percentageChanged = 0.02; 
+                map3D.scene.screenSpaceCameraController.minimumZoomDistance = 130000; // 카메라 접근 제한을 상향하여 줌 8.1에 맞춤
                 
                 // 3D 클릭 로직
                 const handler = new Cesium.ScreenSpaceEventHandler(map3D.scene.canvas);
@@ -552,15 +539,13 @@
 
             } catch (e) { console.warn("Cesium failed", e); }
 
-            // 화면 패닝(이동) 또는 줌 변경 시 다이나믹 마커 클러스터링(Declutter) 및 축척 업데이트 작동
+            // 화면 패닝(이동) 또는 줌 변경 시 다이나믹 마커 클러스터링(Declutter) 작동
             map2D.on('zoomend move', () => {
                 update2DDeclutter();
-                updateScaleInfo();
             });
             if (map3D) {
                 map3D.camera.changed.addEventListener(() => {
                     update3DDeclutter();
-                    updateScaleInfo();
                 });
             }
 
@@ -571,7 +556,6 @@
             setupSort();
             renderAllMarkers(); 
             renderList();
-            updateScaleInfo();
 
             map2D.on('load', () => document.getElementById('loading').classList.add('hidden'));
             setTimeout(() => document.getElementById('loading').classList.add('hidden'), 1500);
@@ -748,31 +732,6 @@
             });
         }
 
-        // 고도 및 줌 레벨 표시 업데이트 함수
-        function updateScaleInfo() {
-            const altSpan = document.getElementById('scale-alt');
-            const zoomSpan = document.getElementById('scale-zoom');
-            if (!altSpan || !zoomSpan) return;
-
-            let heightMeters = 0;
-            let zoomVal = 0;
-
-            if (is3D && map3D) {
-                heightMeters = map3D.camera.positionCartographic.height;
-                zoomVal = Math.max(1.8, Math.min(12, 10 - Math.log2(heightMeters / 35000)));
-            } else if (!is3D && map2D) {
-                zoomVal = map2D.getZoom();
-                heightMeters = 35000 * Math.pow(2, 10 - zoomVal);
-            }
-
-            if (heightMeters >= 1000) {
-                altSpan.textContent = (heightMeters / 1000).toLocaleString(undefined, {maximumFractionDigits: 0}) + ' km';
-            } else {
-                altSpan.textContent = heightMeters.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' m';
-            }
-            zoomSpan.textContent = zoomVal.toFixed(1);
-        }
-
         function setupMarkerToggle() {
             const toggle = document.getElementById('marker-toggle');
             toggle.addEventListener('change', (e) => {
@@ -787,13 +746,11 @@
                 if (!is3D) return; is3D = false;
                 btn2D.classList.add('active'); btn3D.classList.remove('active'); body.classList.remove('is-3d');
                 if (map3D) { const c = getCesiumCenter(); if (c) map2D.setView([c.lat, c.lng], c.zoom, { animate: false }); }
-                updateScaleInfo();
             });
             btn3D.addEventListener('click', () => {
                 if (is3D) return; is3D = true;
                 btn3D.classList.add('active'); btn2D.classList.remove('active'); body.classList.add('is-3d');
                 if (map3D) { const c = map2D.getCenter(); flyTo3D(c.lat, c.lng, map2D.getZoom(), true); }
-                updateScaleInfo();
             });
         }
 
@@ -815,8 +772,8 @@
                 lng = Cesium.Math.toDegrees(cartographic.longitude);
             }
             const height = map3D.camera.positionCartographic.height;
-            // 2D 줌 레벨 비율에 맞추어 3D 카메라 기준 높이 변환 배율 상향 조정 (35000)
-            const zoom = Math.max(1.8, Math.min(12, 10 - Math.log2(height / 35000)));
+            // 2D 줌 레벨 비율에 맞추어 3D 카메라 기준 높이 변환 시 최대 8.1로 제한
+            const zoom = Math.max(1.8, Math.min(8.1, 10 - Math.log2(height / 35000)));
             return { lat, lng, zoom };
         }
 
@@ -919,8 +876,8 @@
 
             if (updateMap) {
                 let targetZoom = 5.0;
-                // 최대 줌 한계치를 10.0에서 12.0(약 10~20km 스케일)으로 대폭 상향
-                if (feature.diam) targetZoom = Math.max(1.8, Math.min(13.0 - Math.log2(feature.diam), 12.0));
+                // 최대 줌 한계치를 8.1로 제한
+                if (feature.diam) targetZoom = Math.max(1.8, Math.min(13.0 - Math.log2(feature.diam), 8.1));
                 if (is3D) flyTo3D(feature.lat, feature.lng, targetZoom);
                 else map2D.flyTo([feature.lat, feature.lng], targetZoom, { animate: true, duration: 1.5 });
             }

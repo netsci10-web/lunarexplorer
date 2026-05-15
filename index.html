@@ -7,7 +7,7 @@
     <!-- Leaflet CSS for 2D Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
-    <!-- Cesium CSS for 3D Globe (안정적인 버전 1.95.0 사용) -->
+    <!-- Cesium CSS for 3D Globe -->
     <link href="https://unpkg.com/cesium@1.95.0/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,62 +28,44 @@
             z-index: 2000;
         }
         
-        .top-left-group {
+        .top-left-group { display: flex; align-items: center; gap: 20px; }
+        .top-right-group { display: flex; align-items: center; gap: 16px; }
+
+        #top-bar h1 { margin: 0; font-size: 1.5rem; font-weight: 700; color: #f8fafc; letter-spacing: -0.025em; }
+        #top-bar p { margin: 0; font-size: 0.85rem; color: #94a3b8; }
+
+        /* Marker Toggle Checkbox */
+        .marker-toggle-label {
             display: flex;
             align-items: center;
-            gap: 20px;
-        }
-
-        .top-right-group {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        #top-bar h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #f8fafc;
-            letter-spacing: -0.025em;
-        }
-        #top-bar p {
-            margin: 0;
+            gap: 6px;
             font-size: 0.85rem;
-            color: #94a3b8;
+            color: #e2e8f0;
+            cursor: pointer;
+            background: #0f172a;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            transition: all 0.2s;
+        }
+        .marker-toggle-label:hover { background: #1e293b; }
+        .marker-toggle-label input[type="checkbox"] {
+            accent-color: #2563eb;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
         }
 
         /* 2D/3D Toggle Switch */
-        .map-toggle {
-            display: flex;
-            background: #0f172a;
-            border-radius: 8px;
-            padding: 4px;
-            border: 1px solid #334155;
-        }
-        .map-toggle button {
-            padding: 6px 14px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border: none;
-            background: transparent;
-            color: #94a3b8;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .map-toggle button.active {
-            background: #2563eb;
-            color: white;
-        }
+        .map-toggle { display: flex; background: #0f172a; border-radius: 8px; padding: 4px; border: 1px solid #334155; }
+        .map-toggle button { padding: 6px 14px; font-size: 0.85rem; font-weight: 600; border: none; background: transparent; color: #94a3b8; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .map-toggle button.active { background: #2563eb; color: white; }
 
         #main-content { display: flex; width: 100%; flex: 1; overflow: hidden; }
-        
         #map-container { flex: 1; height: 100%; position: relative; }
         #leaflet-map { width: 100%; height: 100%; background-color: #000; position: absolute; top: 0; left: 0; z-index: 10; }
         #cesium-container { width: 100%; height: 100%; background-color: #000; position: absolute; top: 0; left: 0; z-index: 5; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         
-        /* When 3D is active */
         body.is-3d #cesium-container { z-index: 15; opacity: 1; pointer-events: auto; }
         body.is-3d #leaflet-map { opacity: 0; pointer-events: none; }
         
@@ -97,98 +79,26 @@
             z-index: 1000;
         }
         
-        /* Search Box Styles */
-        .search-box {
-            padding: 16px;
-            background: #0f172a;
-            border-bottom: 1px solid #1e293b;
-            display: flex;
-            gap: 8px;
-        }
-        .search-box input {
-            flex: 1;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #334155;
-            background: #1e293b;
-            color: #f8fafc;
-            font-size: 0.85rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
+        .search-box { padding: 16px; background: #0f172a; border-bottom: 1px solid #1e293b; display: flex; gap: 8px; }
+        .search-box input { flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #f8fafc; font-size: 0.85rem; outline: none; }
         .search-box input:focus { border-color: #3b82f6; }
-        .search-box button {
-            padding: 8px 16px;
-            border-radius: 6px;
-            background: #2563eb;
-            color: white;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .search-box button:hover { background: #1d4ed8; }
+        .search-box button { padding: 8px 16px; border-radius: 6px; background: #2563eb; color: white; font-size: 0.85rem; font-weight: 600; border: none; cursor: pointer; }
 
-        .category-nav {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 10px 16px;
-            gap: 6px;
-            background: #0f172a;
-            border-bottom: 1px solid #1e293b;
-        }
-        .nav-btn {
-            padding: 6px 12px;
-            font-size: 0.75rem;
-            border-radius: 6px;
-            background: #1e293b;
-            color: #94a3b8;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-        .nav-btn.home-btn {
-            padding: 6px 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .nav-btn:hover { background: #334155; color: #f8fafc; }
-        .nav-btn.active { 
-            background: #2563eb; 
-            color: #ffffff; 
-            font-weight: 600; 
-            border-color: #3b82f6;
-        }
+        .category-nav { display: flex; flex-wrap: wrap; padding: 10px 16px; gap: 6px; background: #0f172a; border-bottom: 1px solid #1e293b; }
+        .nav-btn { padding: 6px 12px; font-size: 0.75rem; border-radius: 6px; background: #1e293b; color: #94a3b8; cursor: pointer; border: 1px solid transparent; }
+        .nav-btn .count { opacity: 0.7; margin-left: 2px; font-size: 0.9em; }
+        .nav-btn.home-btn { padding: 6px 10px; display: flex; align-items: center; justify-content: center; }
+        .nav-btn.active { background: #2563eb; color: white; font-weight: 600; border-color: #3b82f6; }
 
-        /* Sort Controls Styles */
-        .sort-controls {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding: 0 16px 10px;
-            gap: 8px;
-            background: #0f172a;
-            border-bottom: 1px solid #1e293b;
-        }
+        .sort-controls { display: flex; justify-content: flex-end; align-items: center; padding: 0 16px 10px; gap: 8px; background: #0f172a; border-bottom: 1px solid #1e293b; }
         .sort-label { font-size: 0.75rem; color: #64748b; }
-        .sort-select {
-            background: #1e293b; color: #e2e8f0; border: 1px solid #334155; 
-            border-radius: 4px; font-size: 0.75rem; padding: 4px 8px; outline: none;
-            cursor: pointer;
-        }
+        .sort-select { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 4px; font-size: 0.75rem; padding: 4px 8px; outline: none; }
 
-        #feature-list { flex: 1; overflow-y: auto; padding: 5px 0; }
+        #feature-list { flex: 1; overflow-y: auto; padding: 5px 0; scroll-behavior: smooth; }
         #feature-list::-webkit-scrollbar { width: 5px; }
         #feature-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         
-        .feature-item { 
-            padding: 12px 20px; 
-            border-bottom: 1px solid #1e293b; 
-            cursor: pointer; 
-            transition: background 0.2s;
-        }
+        .feature-item { padding: 12px 20px; border-bottom: 1px solid #1e293b; cursor: pointer; transition: background 0.2s; }
         .feature-item:hover { background-color: #1e293b; }
         .feature-item.active { background-color: #1e293b; border-left: 4px solid #3b82f6; }
         
@@ -196,24 +106,47 @@
         .feature-name { font-weight: 600; color: #f1f5f9; margin-bottom: 2px; font-size: 0.95rem; }
         .feature-desc { font-size: 0.8rem; color: #64748b; line-height: 1.4; }
         
-        #loading {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 3000; transition: opacity 0.5s;
-        }
+        #loading { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 3000; transition: opacity 0.5s; }
         .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #2563eb; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden { opacity: 0; pointer-events: none; }
+
+        /* 2D Label Marker Styles */
+        .feature-label-icon { cursor: pointer; display: flex !important; flex-direction: column; align-items: center; justify-content: flex-start; overflow: visible !important; }
+        .feature-label-icon .marker-id-container {
+            background-color: #000;
+            color: #fff;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            min-height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            border: 1.5px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        }
+        .feature-label-icon .marker-name {
+            display: none;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            margin-top: 6px;
+            white-space: nowrap;
+        }
+        .show-names .feature-label-icon .marker-name { display: block; }
 
         @media (max-width: 768px) {
             #main-content { flex-direction: column; }
             #sidebar { width: 100%; height: 50vh; }
             #map-container { height: 50vh; }
             #top-bar { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .top-right-group { width: 100%; justify-content: flex-end; }
+            .top-right-group { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
         }
         
-        /* Hide Cesium default UI elements */
         .cesium-viewer-bottom, .cesium-viewer-toolbar, .cesium-viewer-animationContainer, .cesium-viewer-timelineContainer { display: none !important; }
     </style>
 </head>
@@ -224,11 +157,17 @@
         </div>
         <div class="top-right-group">
             <p class="hidden md:block">NASA LRO 데이터 기반 달 표면 탐사 및 루나 100 목록</p>
-            <!-- 2D/3D Toggle Switch -->
+            
             <div class="map-toggle">
                 <button id="btn-2d" class="active">2D 평면</button>
                 <button id="btn-3d">3D 지구본</button>
             </div>
+
+            <!-- 마커 표시 토글 스위치 -->
+            <label class="marker-toggle-label" title="지도 위에 분류번호 마커 표시 여부">
+                <input type="checkbox" id="marker-toggle">
+                <span>지형마크</span>
+            </label>
         </div>
     </div>
 
@@ -243,29 +182,26 @@
         </div>
         
         <div id="sidebar">
-            <!-- Search Box -->
             <div class="search-box">
-                <input type="text" id="search-input" placeholder="지형 이름 검색 (예: 코페르니쿠스, 바다)">
+                <input type="text" id="search-input" placeholder="지형 이름 검색">
                 <button id="search-btn">찾기</button>
             </div>
             
             <div class="category-nav" id="nav" style="border-bottom: none;">
-                <!-- Home Button -->
                 <button id="btn-home" class="nav-btn home-btn" title="지도 및 설정 초기화">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                         <polyline points="9 22 9 12 15 12 15 22"></polyline>
                     </svg>
                 </button>
-                <div class="nav-btn active" data-type="all">전체</div>
-                <div class="nav-btn" data-type="sea">달의 바다</div>
-                <div class="nav-btn" data-type="mountain">산맥/단층</div>
-                <div class="nav-btn" data-type="crater">충돌구</div>
-                <div class="nav-btn" data-type="volcanic">화산 지형</div>
-                <div class="nav-btn" data-type="luna100">루나 100</div>
+                <div class="nav-btn active" data-type="all">전체 <span class="count"></span></div>
+                <div class="nav-btn" data-type="sea">달의 바다 <span class="count"></span></div>
+                <div class="nav-btn" data-type="mountain">산맥/단층 <span class="count"></span></div>
+                <div class="nav-btn" data-type="crater">충돌구 <span class="count"></span></div>
+                <div class="nav-btn" data-type="volcanic">화산 지형 <span class="count"></span></div>
+                <div class="nav-btn" data-type="luna100">루나 100 <span class="count"></span></div>
             </div>
 
-            <!-- Sort Controls -->
             <div class="sort-controls" id="sort-controls">
                 <span class="sort-label">정렬 기준:</span>
                 <select class="sort-select" id="sort-select">
@@ -278,18 +214,14 @@
         </div>
     </div>
 
-    <!-- Leaflet JS -->
+    <!-- Leaflet & Cesium JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- CesiumJS Web Worker 설정을 위한 Base URL 명시적 지정 -->
-    <script>
-        window.CESIUM_BASE_URL = 'https://unpkg.com/cesium@1.95.0/Build/Cesium/';
-    </script>
+    <script>window.CESIUM_BASE_URL = 'https://unpkg.com/cesium@1.95.0/Build/Cesium/';</script>
     <script src="https://unpkg.com/cesium@1.95.0/Build/Cesium/Cesium.js"></script>
     
     <script>
         const moonFeatures = [
-            // --- 달의 바다 (Sea) ---
+            // --- 달의 바다 ---
             { id: 'M1', name: '고요의 바다 (Mare Tranquillitatis)', lat: 8.5, lng: 28.3, diam: 873, types: ['sea'], desc: '아폴로 11호가 착륙한 역사적인 바다.' },
             { id: 'M2', name: '비의 바다 (Mare Imbrium)', lat: 32.8, lng: -15.6, diam: 1145, types: ['sea'], desc: '가장 뚜렷한 동심원 구조의 거대 분지.' },
             { id: 'M3', name: '맑은 바다 (Mare Serenitatis)', lat: 28.0, lng: 17.5, diam: 707, types: ['sea'], desc: '주변 바다들과 뚜렷한 경계를 이룸.' },
@@ -313,485 +245,287 @@
             { id: 'M21', lunaId: 'L95', name: '폭풍의 대양 (Oceanus Procellarum)', lat: 23.0, lng: -15.0, diam: 3200, types: ['sea', 'luna100'], desc: '달에서 가장 넓고 광활한 바다.' },
             { id: 'M22', lunaId: 'L100', name: '가장자리의 바다 소용돌이', lat: 18.5, lng: 88.0, diam: 100, types: ['sea', 'volcanic', 'luna100'], desc: '자기 이상으로 인해 나타난 신비로운 소용돌이 무늬 지형.' },
             
-            // --- 산맥 및 단층 (Mountain) ---
-            { id: 'MT1', name: '코카서스 산맥 (Montes Caucasus)', lat: 38.4, lng: 10.0, diam: 520, types: ['mountain'], desc: '비의 바다와 맑은 바다를 나누는 험준한 산맥.' },
-            { id: 'MT2', name: '알프스 산맥 (Montes Alpes)', lat: 46.4, lng: -0.8, diam: 281, types: ['mountain'], desc: '알프스 계곡을 품고 있는 거대 산맥.' },
-            { id: 'MT3', name: '유라 산맥 (Montes Jura)', lat: 47.1, lng: -34.0, diam: 422, types: ['mountain'], desc: '무지개 만을 반원형으로 둘러싼 산맥.' },
-            { id: 'MT4', name: '카르파투스 산맥 (Montes Carpatus)', lat: 14.5, lng: -24.4, diam: 361, types: ['mountain'], desc: '비의 바다 남쪽 경계를 이루는 산맥.' },
-            { id: 'MT5', name: '하이무스 산맥 (Montes Haemus)', lat: 19.9, lng: 9.2, diam: 400, types: ['mountain'], desc: '맑은 바다의 남서쪽 가장자리를 따라 뻗은 산맥.' },
-            { id: 'MT6', name: '테네리페 산맥 (Montes Teneriffe)', lat: 47.1, lng: -11.8, diam: 110, types: ['mountain'], desc: '비의 바다 북부에 흩어져 있는 고립된 산맥들의 집합.' },
-            { id: 'MT7', name: '직선 산맥 (Montes Recti)', lat: 48.0, lng: -20.0, diam: 90, types: ['mountain'], desc: '이름 그대로 동서로 일직선으로 뻗어있는 특이한 산맥.' },
-            { id: 'MT8', name: '하위헌스 산 (Mons Huygens)', lat: 20.0, lng: -2.9, diam: 40, types: ['mountain'], desc: '달의 앞면에서 가장 높은 산 (높이 약 5.5km).' },
-            { id: 'MT9', name: '해들리 산 (Mons Hadley)', lat: 26.5, lng: 4.7, diam: 25, types: ['mountain'], desc: '아폴로 15호 착륙지 근처에 우뚝 솟은 아펜니노 산맥 주요 봉.' },
-            { id: 'MT10', lunaId: 'L4', name: '아펜니노 산맥 (Montes Apenninus)', lat: 18.9, lng: -3.7, diam: 400, types: ['mountain', 'luna100'], desc: '비의 바다 가장자리의 장엄한 산맥.' },
-            { id: 'MT11', lunaId: 'L7', name: '알타이 절벽 (Rupes Altai)', lat: -24.3, lng: 22.6, diam: 425, types: ['mountain', 'luna100'], desc: '감로주의 바다 분지의 다중 고리 절벽.' },
-            { id: 'MT12', lunaId: 'L15', name: '직선 절벽 (Rupes Recta)', lat: -21.8, lng: -7.8, diam: 110, types: ['mountain', 'volcanic', 'luna100'], desc: '구름의 바다에 위치한 유명한 일직선 단층.' },
-            { id: 'MT13', lunaId: 'L23', name: '피코 산 (Mons Pico)', lat: 45.7, lng: -8.9, diam: 25, types: ['mountain', 'luna100'], desc: '비의 바다 한가운데에 고립되어 솟은 거대 봉우리.' },
+            // --- 산맥 및 단층 ---
+            { id: 'MT1', name: '코카서스 산맥', lat: 38.4, lng: 10.0, diam: 520, types: ['mountain'], desc: '비의 바다와 맑은 바다를 나누는 험준한 산맥.' },
+            { id: 'MT2', name: '알프스 산맥', lat: 46.4, lng: -0.8, diam: 281, types: ['mountain'], desc: '알프스 계곡을 품고 있는 거대 산맥.' },
+            { id: 'MT3', name: '유라 산맥', lat: 47.1, lng: -34.0, diam: 422, types: ['mountain'], desc: '무지개 만을 반원형으로 둘러싼 산맥.' },
+            { id: 'MT4', name: '카르파투스 산맥', lat: 14.5, lng: -24.4, diam: 361, types: ['mountain'], desc: '비의 바다 남쪽 경계를 이루는 산맥.' },
+            { id: 'MT5', name: '하이무스 산맥', lat: 19.9, lng: 9.2, diam: 400, types: ['mountain'], desc: '맑은 바다의 남서쪽 가장자리를 따라 뻗은 산맥.' },
+            { id: 'MT6', name: '테네리페 산맥', lat: 47.1, lng: -11.8, diam: 110, types: ['mountain'], desc: '비의 바다 북부에 흩어져 있는 고립된 산맥들의 집합.' },
+            { id: 'MT7', name: '직선 산맥', lat: 48.0, lng: -20.0, diam: 90, types: ['mountain'], desc: '이름 그대로 동서로 일직선으로 뻗어있는 특이한 산맥.' },
+            { id: 'MT8', name: '하위헌스 산', lat: 20.0, lng: -2.9, diam: 40, types: ['mountain'], desc: '달의 앞면에서 가장 높은 산 (높이 약 5.5km).' },
+            { id: 'MT9', name: '해들리 산', lat: 26.5, lng: 4.7, diam: 25, types: ['mountain'], desc: '아폴로 15호 착륙지 근처에 우뚝 솟은 아펜니노 산맥 주요 봉.' },
+            { id: 'MT10', lunaId: 'L4', name: '아펜니노 산맥', lat: 18.9, lng: -3.7, diam: 400, types: ['mountain', 'luna100'], desc: '비의 바다 가장자리의 장엄한 산맥.' },
+            { id: 'MT11', lunaId: 'L7', name: '알타이 절벽', lat: -24.3, lng: 22.6, diam: 425, types: ['mountain', 'luna100'], desc: '감로주의 바다 분지의 다중 고리 절벽.' },
+            { id: 'MT12', lunaId: 'L15', name: '직선 절벽', lat: -21.8, lng: -7.8, diam: 110, types: ['mountain', 'volcanic', 'luna100'], desc: '구름의 바다에 위치한 유명한 일직선 단층.' },
+            { id: 'MT13', lunaId: 'L23', name: '피코 산', lat: 45.7, lng: -8.9, diam: 25, types: ['mountain', 'luna100'], desc: '비의 바다 한가운데에 고립되어 솟은 거대 봉우리.' },
             { id: 'MT14', lunaId: 'L46', name: '레기오몬타누스 중앙 봉우리', lat: -28.0, lng: -0.6, diam: 124, types: ['mountain', 'luna100'], desc: '정상에 분화구가 있어 화산으로 추정되었던 봉우리.' },
-            { id: 'MT15', lunaId: 'L96', name: '라이프니츠 산맥 (Leibnitz Mountains)', lat: -85.0, lng: 30.0, diam: 200, types: ['mountain', 'luna100'], desc: '남극-에이트켄 분지 테두리의 달에서 가장 높은 산맥 지대.' },
+            { id: 'MT15', lunaId: 'L96', name: '라이프니츠 산맥', lat: -85.0, lng: 30.0, diam: 200, types: ['mountain', 'luna100'], desc: '남극-에이트켄 분지 테두리의 달에서 가장 높은 산맥 지대.' },
+            { id: 'MT16', name: '라플라스 곶', lat: 46.0, lng: -25.8, diam: 50, types: ['mountain'], desc: '무지개 만의 동쪽 끝을 지키는 가파르고 웅장한 절벽 곶.' },
+            { id: 'MT17', name: '헤라클레스 곶', lat: 40.3, lng: -33.2, diam: 50, types: ['mountain'], desc: '무지개 만 서쪽 끝에 있는 곶으로, 달의 여인 형상으로 유명함.' },
+            { id: 'MT18', name: '스피츠베르겐 산맥', lat: 35.0, lng: -15.0, diam: 60, types: ['mountain'], desc: '비의 바다 평원 한가운데 홀로 솟은 톱니 모양 산맥.' },
+            { id: 'MT19', name: '피레네 산맥', lat: -15.6, lng: 41.2, diam: 164, types: ['mountain'], desc: '감로주의 바다 동쪽 경계를 이루는 험준한 산맥.' },
+            { id: 'MT20', name: '리비히 절벽', lat: -25.0, lng: -46.0, diam: 180, types: ['mountain'], desc: '습기의 바다 서쪽 해안을 따라 뻗은 단층애.' },
+            { id: 'MT21', name: '하빈저 산맥', lat: 27.0, lng: -41.0, diam: 90, types: ['mountain'], desc: '아리스타르쿠스 크레이터 북동쪽의 고지대 봉우리들.' },
+            { id: 'MT22', name: '브래들리 산', lat: 21.7, lng: 0.4, diam: 30, types: ['mountain'], desc: '아펜니노 산맥에서 가장 높은 봉우리 중 하나.' },
+            { id: 'MT23', name: '코르딜레라 산맥', lat: -17.5, lng: -81.6, diam: 574, types: ['mountain'], desc: '동쪽의 바다를 둘러싼 가장 바깥쪽 산맥.' },
+            { id: 'MT24', name: '루크 산맥', lat: -20.6, lng: -82.5, diam: 682, types: ['mountain'], desc: '동쪽의 바다를 둘러싼 안쪽 험준한 산맥 지대.' },
+            { id: 'MT25', name: '세키 산맥', lat: 3.0, lng: 43.0, diam: 50, types: ['mountain'], desc: '풍요의 바다 북서쪽 테두리에 있는 아담한 산맥.' },
 
-            // --- 충돌구 (Crater) ---
+            // --- 충돌구 ---
             { id: 'C1', name: '플라톤 (Plato)', lat: 51.6, lng: -9.4, diam: 101, types: ['crater'], desc: '용암으로 차 바닥이 어두워 대호수로 불리는 크레이터.' },
-            { id: 'C2', name: '프톨레마이오스 (Ptolemaeus)', lat: -9.2, lng: -1.8, diam: 153, types: ['crater'], desc: '중앙 부근 거대하고 평평한 충돌구.' },
-            { id: 'C3', name: '알폰수스 (Alphonsus)', lat: -13.4, lng: -3.2, diam: 119, types: ['crater'], desc: '내부에 화산재 반점을 가진 크레이터.' },
-            { id: 'C4', name: '아르자켈 (Arzachel)', lat: -18.2, lng: -1.9, diam: 96, types: ['crater'], desc: '중앙 삼총사 중 가장 남쪽에 위치.' },
-            { id: 'C5', name: '케플러 (Kepler)', lat: 8.1, lng: -38.0, diam: 31, types: ['crater'], desc: '작지만 빛나는 광조 크레이터.' },
-            { id: 'C6', name: '에라토스테네스 (Eratosthenes)', lat: 14.5, lng: -11.3, diam: 58, types: ['crater'], desc: '뚜렷한 단구를 가진 표준적인 크레이터.' },
-            { id: 'C7', name: '불리알두스 (Bullialdus)', lat: -20.7, lng: -22.2, diam: 61, types: ['crater'], desc: '구름의 바다 한가운데에 있는 거대하고 깊은 충돌구.' },
-            { id: 'C8', name: '아리스토텔레스 (Aristoteles)', lat: 50.2, lng: 17.4, diam: 87, types: ['crater'], desc: '추위의 바다 남쪽에 위치한 화려한 쌍둥이 크레이터 중 큰 쪽.' },
-            { id: 'C9', name: '에우독소스 (Eudoxus)', lat: 44.3, lng: 16.3, diam: 67, types: ['crater'], desc: '아리스토텔레스와 쌍을 이루는 남쪽의 크레이터.' },
-            { id: 'C10', name: '모레투스 (Moretus)', lat: -70.6, lng: -5.8, diam: 114, types: ['crater'], desc: '매우 높고 뾰족한 중앙 봉우리를 자랑합니다.' },
-            { id: 'C11', name: '엔디미온 (Endymion)', lat: 53.6, lng: 56.5, diam: 125, types: ['crater'], desc: '동북쪽 가장자리에 있으며 짙은 용암으로 덮여 있습니다.' },
-            { id: 'C12', name: '헤라클레스 (Hercules)', lat: 46.8, lng: 39.1, diam: 69, types: ['crater'], desc: '아틀라스 크레이터 옆에 위치하며 내부에 작은 크레이터를 품고 있습니다.' },
-            { id: 'C13', name: '얀센 (Janssen)', lat: -44.9, lng: 41.5, diam: 190, types: ['crater'], desc: '낡은 성벽과 복잡한 계곡망을 가진 거대 크레이터.' },
-            { id: 'C14', name: '클레오메데스 (Cleomedes)', lat: 27.7, lng: 55.5, diam: 125, types: ['crater'], desc: '위기의 바다 북쪽에 있는 거대하고 오래된 벽 평원입니다.' },
-            { id: 'C15', name: '슈퇴플러 (Stöfler)', lat: -41.1, lng: 6.0, diam: 126, types: ['crater'], desc: '심하게 겹쳐진 남부의 거대 크레이터.' },
-            { id: 'C16', lunaId: 'L5', name: '코페르니쿠스 (Copernicus)', lat: 9.7, lng: -20.1, diam: 93, types: ['crater', 'luna100'], desc: '화려한 광조를 가진 달의 군주 충돌구.' },
-            { id: 'C17', lunaId: 'L6', name: '티코 (Tycho)', lat: -43.4, lng: -11.1, diam: 85, types: ['crater', 'luna100'], desc: '남부 고지대의 가장 눈에 띄는 젊은 광조 충돌구.' },
-            { id: 'C18', lunaId: 'L8', name: '테오필루스 삼형제', lat: -13.2, lng: 24.0, diam: 100, types: ['crater', 'luna100'], desc: '테오필루스, 키릴루스, 카타리나로 이어지는 충돌구 연쇄.' },
-            { id: 'C19', lunaId: 'L9', name: '클라비우스 (Clavius)', lat: -58.8, lng: -14.1, diam: 225, types: ['crater', 'luna100'], desc: '고지대의 거대한 고대 충돌구.' },
-            { id: 'C20', lunaId: 'L11', name: '아리스타르쿠스 (Aristarchus)', lat: 23.7, lng: -47.4, diam: 40, types: ['crater', 'luna100'], desc: '달에서 가장 밝은(알베도가 높은) 충돌구.' },
-            { id: 'C21', lunaId: 'L12', name: '프로클루스 (Proclus)', lat: 16.1, lng: 46.8, diam: 28, types: ['crater', 'luna100'], desc: '비스듬한 충돌로 생긴 비대칭 광조 크레이터.' },
-            { id: 'C22', lunaId: 'L13', name: '가센디 (Gassendi)', lat: -17.6, lng: -40.1, diam: 101, types: ['crater', 'luna100'], desc: '습기의 바다 가장자리의 바닥이 갈라진 크레이터.' },
-            { id: 'C23', lunaId: 'L16', name: '페타비우스 (Petavius)', lat: -25.1, lng: 60.4, diam: 177, types: ['crater', 'luna100'], desc: '바닥 중심에서 뻗어나가는 거대 융기선이 있는 대형 크레이터.' },
-            { id: 'C24', lunaId: 'L20', name: '포시도니우스 (Posidonius)', lat: 31.8, lng: 29.9, diam: 95, types: ['crater', 'luna100'], desc: '내부 구조가 복잡하게 갈라진 크레이터.' },
-            { id: 'C25', lunaId: 'L21', name: '프라카스토리우스 (Fracastorius)', lat: -21.5, lng: 33.2, diam: 124, types: ['crater', 'luna100'], desc: '감로주의 바다에 잠겨 북쪽 벽이 허물어진 크레이터.' },
-            { id: 'C26', lunaId: 'L25', name: '메시에 및 메시에 A', lat: -1.9, lng: 47.6, diam: 11, types: ['crater', 'luna100'], desc: '매우 얕은 각도의 비스듬한 충돌로 생긴 쌍둥이 충돌구와 광조.' },
-            { id: 'C27', lunaId: 'L27', name: '아르키메데스 (Archimedes)', lat: 29.7, lng: -4.0, diam: 83, types: ['crater', 'luna100'], desc: '용암에 의해 바닥이 평평해진 비의 바다 내부 충돌구.' },
-            { id: 'C28', lunaId: 'L28', name: '히파르쿠스 (Hipparchus)', lat: -5.5, lng: 4.8, diam: 150, types: ['crater', 'luna100'], desc: '갈릴레오가 처음 스케치했던 고대 크레이터의 잔해.' },
-            { id: 'C29', lunaId: 'L30', name: '쉴러 (Schiller)', lat: -51.9, lng: -39.0, diam: 180, types: ['crater', 'luna100'], desc: '비스듬한 충돌로 길게 늘어난 독특한 타원형 크레이터.' },
-            { id: 'C30', lunaId: 'L31', name: '타룬티우스 (Taruntius)', lat: 5.6, lng: 46.5, diam: 56, types: ['crater', 'luna100'], desc: '바닥이 융기하고 갈라진 상대적으로 젊은 크레이터.' },
-            { id: 'C31', lunaId: 'L36', name: '그리말디 (Grimaldi)', lat: -5.5, lng: -68.3, diam: 440, types: ['crater', 'luna100'], desc: '달의 가장자리에서 매우 어둡게 보이는 이중 고리 분지.' },
-            { id: 'C32', lunaId: 'L37', name: '바이이 (Bailly)', lat: -66.5, lng: -69.1, diam: 303, types: ['crater', 'luna100'], desc: '테두리를 간신히 식별할 수 있는 극지방 거대 분지.' },
-            { id: 'C33', lunaId: 'L38', name: '사빈 및 리터 (Sabine/Ritter)', lat: 1.7, lng: 19.7, diam: 30, types: ['crater', 'luna100'], desc: '거의 동일한 형태를 지닌 쌍둥이 크레이터.' },
-            { id: 'C34', lunaId: 'L39', name: '쉬카드 (Schickard)', lat: -44.3, lng: -55.3, diam: 227, types: ['crater', 'luna100'], desc: '오리엔탈레 분지에서 날아온 분출물 흔적이 덮인 바닥.' },
-            { id: 'C35', lunaId: 'L43', name: '바르겐틴 (Wargentin)', lat: -49.6, lng: -60.2, diam: 84, types: ['crater', 'luna100'], desc: '용암이 테두리까지 차올라 고원이 된 특이한 크레이터.' },
-            { id: 'C36', lunaId: 'L44', name: '메르세니우스 (Mersenius)', lat: -21.5, lng: -49.2, diam: 84, types: ['crater', 'luna100'], desc: '바닥이 위로 볼록하게 솟아오른(돔형) 크레이터.' },
-            { id: 'C37', lunaId: 'L45', name: '마우롤리쿠스 (Maurolycus)', lat: -42.0, lng: 14.0, diam: 114, types: ['crater', 'luna100'], desc: '수많은 크레이터가 포화된 복잡한 남부 고지대 영역.' },
-            { id: 'C38', lunaId: 'L51', name: '데이비 사슬 (Catena Davy)', lat: -11.1, lng: -6.6, diam: 50, types: ['crater', 'luna100'], desc: '조석력에 부서진 혜성 조각들이 일렬로 충돌한 자국.' },
-            { id: 'C39', lunaId: 'L55', name: '바코 (Baco)', lat: -51.0, lng: 19.1, diam: 69, types: ['crater', 'luna100'], desc: '주변 지형에 비해 이례적으로 바닥이 매끄러운 크레이터.' },
-            { id: 'C40', lunaId: 'L61', name: '뫼스팅 A (Mösting A)', lat: -3.2, lng: -5.2, diam: 13, types: ['crater', 'luna100'], desc: '달의 중심부 좌표 측정에 기준이 되는 매우 밝은 충돌구.' },
-            { id: 'C41', lunaId: 'L64', name: '데카르트 (Descartes)', lat: -11.7, lng: 15.7, diam: 48, types: ['crater', 'luna100'], desc: '아폴로 16호가 착륙한 자기 이상 현상이 있는 고지대.' },
-            { id: 'C42', lunaId: 'L67', name: '프라 마우로 형성 (Fra Mauro)', lat: -3.6, lng: -17.5, diam: 95, types: ['crater', 'luna100'], desc: '아폴로 14호가 탐사한 비의 바다 분출물 퇴적지대.' },
-            { id: 'C43', lunaId: 'L69', name: '코페르니쿠스 이차 크레이터', lat: 19.6, lng: -19.1, diam: 4, types: ['crater', 'luna100'], desc: '코페르니쿠스 충돌 파편이 만들어낸 수많은 작은 구덩이들.' },
-            { id: 'C44', lunaId: 'L74', name: '코페르니쿠스 H', lat: 6.9, lng: -18.3, diam: 5, types: ['crater', 'luna100'], desc: '어두운 광조를 가진 작은 충돌구.' },
-            { id: 'C45', lunaId: 'L75', name: '프톨레마이오스 B', lat: -8.0, lng: -0.8, diam: 16, types: ['crater', 'luna100'], desc: '거대 크레이터 바닥에 있는 접시 모양의 움푹한 구덩이.' },
-            { id: 'C46', lunaId: 'L76', name: 'W. 본드 (W. Bond)', lat: 65.3, lng: 3.7, diam: 158, types: ['crater', 'luna100'], desc: '비의 바다 분출물에 의해 심하게 허물어지고 평평해진 크레이터.' },
-            { id: 'C47', lunaId: 'L78', name: '람베르트 R (Lambert R)', lat: 23.8, lng: -20.6, diam: 54, types: ['crater', 'luna100'], desc: '용암에 완전히 잠겨 테두리만 희미하게 남은 유령 충돌구.' },
-            { id: 'C48', lunaId: 'L81', name: '헤시오두스 A (Hesiodus A)', lat: -30.1, lng: -17.0, diam: 15, types: ['crater', 'luna100'], desc: '내부에 완벽한 동심원 고리를 가진 특이한 충돌구.' },
-            { id: 'C49', lunaId: 'L82', name: '린네 (Linné)', lat: 27.7, lng: 11.8, diam: 2.4, types: ['crater', 'luna100'], desc: '사라졌다는 소문이 돌았던, 매우 작고 밝은 신선한 충돌구.' },
-            { id: 'C50', lunaId: 'L83', name: '플라톤 내부 소구들', lat: 51.6, lng: -9.4, diam: 2, types: ['crater', 'luna100'], desc: '플라톤 내부의 평평한 바닥에 있는 미세한 충돌구 무리 (광학 테스트용).' },
-            { id: 'C51', lunaId: 'L84', name: '피타투스 (Pitatus)', lat: -29.8, lng: -13.5, diam: 97, types: ['crater', 'volcanic', 'luna100'], desc: '내부 가장자리를 따라 갈라진 동심원 계곡을 가진 크레이터.' },
-            { id: 'C52', lunaId: 'L85', name: '랑그레누스 광조', lat: -8.9, lng: 60.9, diam: 132, types: ['crater', 'luna100'], desc: '매우 오래되어 희미해진 광조 시스템의 잔해.' },
-            { id: 'C53', lunaId: 'L87', name: '훔볼트 (Humboldt)', lat: -27.0, lng: 80.9, diam: 207, types: ['crater', 'luna100'], desc: '중앙 봉우리와 어두운 화산재 반점, 갈라진 바닥을 모두 가진 거대 크레이터.' },
-            { id: 'C54', lunaId: 'L88', name: '피어리 (Peary)', lat: 88.6, lng: 33.0, diam: 74, types: ['crater', 'luna100'], desc: '북극점에 매우 가까워 항상 그림자가 지는 크레이터.' },
-            { id: 'C55', lunaId: 'L90', name: '암스트롱/올드린/콜린스', lat: 1.3, lng: 23.7, diam: 3, types: ['crater', 'luna100'], desc: '아폴로 11호 대원 3명의 이름이 붙여진 작은 충돌구들.' },
-            { id: 'C56', lunaId: 'L93', name: '디오니시우스 광조 (Dionysius)', lat: 2.8, lng: 17.3, diam: 18, types: ['crater', 'luna100'], desc: '밝은 대신 특이하게 어두운 빛을 띠는 희귀한 광조.' },
-            { id: 'C57', lunaId: 'L94', name: '드리갈스키 (Drygalski)', lat: -79.3, lng: -84.9, diam: 162, types: ['crater', 'luna100'], desc: '남극 근처, 거대한 봉우리를 가진 대형 충돌구.' },
-
-            // --- 화산 지형 (Volcanic / Rilles) ---
-            { id: 'V1', name: '스넬리우스 계곡 (Vallis Snellius)', lat: -31.1, lng: 56.0, diam: 592, types: ['volcanic'], desc: '달에서 가장 긴 선형 계곡 중 하나로 험준한 지형을 가로지릅니다.' },
-            { id: 'V2', name: '코시 절벽 (Rupes Cauchy)', lat: 9.0, lng: 37.0, diam: 120, types: ['volcanic', 'mountain'], desc: '코시 크레이터 남쪽에 있는 또렷한 단층선입니다.' },
-            { id: 'V3', lunaId: 'L14', name: '무지개 만 (Sinus Iridum)', lat: 45.0, lng: -32.0, diam: 260, types: ['volcanic', 'sea', 'luna100'], desc: '비의 바다 테두리가 잠겨 형성된 반원형 만.' },
-            { id: 'V4', lunaId: 'L17', name: '슈뢰터 계곡 (Vallis Schröteri)', lat: 26.2, lng: -50.8, diam: 168, types: ['volcanic', 'luna100'], desc: '아리스타르쿠스 고원의 거대한 구불구불한 화산 계곡.' },
-            { id: 'V5', lunaId: 'L19', name: '알프스 계곡 (Vallis Alpes)', lat: 49.0, lng: 3.0, diam: 165, types: ['volcanic', 'luna100'], desc: '알프스 산맥을 쪼개듯 가로지르는 거대한 직선 지구대.' },
-            { id: 'V6', lunaId: 'L22', name: '아리스타르쿠스 고원', lat: 26.0, lng: -51.0, diam: 150, types: ['volcanic', 'luna100'], desc: '화산재(쇄설물)로 덮인 붉은빛 융기 지역.' },
-            { id: 'V7', lunaId: 'L24', name: '히기누스 계곡 (Rima Hyginus)', lat: 7.4, lng: 7.8, diam: 220, types: ['volcanic', 'luna100'], desc: '화산 가스 폭발 구덩이들이 이어져 만들어진 단층 계곡.' },
-            { id: 'V8', lunaId: 'L29', name: '아리아데우스 계곡 (Rima Ariadaeus)', lat: 6.4, lng: 14.0, diam: 250, types: ['volcanic', 'luna100'], desc: '고요의 바다 근처의 선명한 선형 단층 계곡.' },
-            { id: 'V9', lunaId: 'L32', name: '아라고 돔 (Arago Domes)', lat: 6.2, lng: 21.4, diam: 26, types: ['volcanic', 'luna100'], desc: '고요의 바다에 위치한 점성 높은 용암 돔.' },
-            { id: 'V10', lunaId: 'L33', name: '뱀등성이 (Serpentine Ridge)', lat: 27.3, lng: 25.3, diam: 155, types: ['volcanic', 'luna100'], desc: '맑은 바다의 거대한 주름 능선.' },
-            { id: 'V11', lunaId: 'L35', name: '트리스네커 계곡군 (Rimae Triesnecker)', lat: 4.3, lng: 4.6, diam: 215, types: ['volcanic', 'luna100'], desc: '그물망처럼 복잡하게 얽힌 계곡 시스템.' },
-            { id: 'V12', lunaId: 'L40', name: '얀센 계곡 (Rimae Janssen)', lat: -45.4, lng: 39.3, diam: 190, types: ['volcanic', 'luna100'], desc: '고지대에서는 드물게 나타나는 계곡.' },
-            { id: 'V13', lunaId: 'L42', name: '마리우스 언덕 (Marius Hills)', lat: 12.5, lng: -54.0, diam: 125, types: ['volcanic', 'luna100'], desc: '수십 개의 돔과 원뿔이 밀집한 화산 복합 단지.' },
-            { id: 'V14', lunaId: 'L47', name: '알폰수스 흑점', lat: -13.7, lng: -3.2, diam: 119, types: ['volcanic', 'luna100'], desc: '크레이터 바닥의 화산재 분출 흔적.' },
-            { id: 'V15', lunaId: 'L48', name: '코시 지역 (Cauchy Region)', lat: 10.5, lng: 38.0, diam: 130, types: ['volcanic', 'luna100'], desc: '계곡, 단층, 돔이 좁은 지역에 모여있는 지대.' },
-            { id: 'V16', lunaId: 'L49', name: '그루이투이젠 델타 및 감마', lat: 36.3, lng: -40.0, diam: 20, types: ['volcanic', 'luna100'], desc: '점성이 매우 높은 용암으로 만들어진 가파른 화산 돔.' },
-            { id: 'V17', lunaId: 'L52', name: '크루거 (Crüger)', lat: -16.7, lng: -66.8, diam: 45, types: ['volcanic', 'luna100'], desc: '화산 칼데라일 가능성이 있는 어두운 용암 크레이터.' },
-            { id: 'V18', lunaId: 'L53', name: '라몬트 (Lamont)', lat: 4.4, lng: 23.7, diam: 106, types: ['volcanic', 'luna100'], desc: '용암에 묻힌 분지 위로 나타난 거미줄 모양 주름 능선.' },
-            { id: 'V19', lunaId: 'L54', name: '히팔루스 계곡 (Rimae Hippalus)', lat: -24.5, lng: -29.0, diam: 240, types: ['volcanic', 'luna100'], desc: '습기의 바다와 동심원을 그리는 거대한 단층 계곡.' },
-            { id: 'V20', lunaId: 'L57', name: '라이너 감마 (Reiner Gamma)', lat: 7.7, lng: -59.2, diam: 70, types: ['volcanic', 'luna100'], desc: '태양풍을 막는 국지적 자기장에 의해 형성된 소용돌이 무늬.' },
-            { id: 'V21', lunaId: 'L58', name: '라이타 계곡 (Vallis Rheita)', lat: -42.5, lng: 51.5, diam: 445, types: ['volcanic', 'luna100'], desc: '넥타리스 분지에서 튀어 나간 파편들이 만든 거대한 이차 충돌구 사슬.' },
-            { id: 'V22', lunaId: 'L60', name: '키스 파이 돔 (Kies Pi)', lat: -26.9, lng: -24.2, diam: 45, types: ['volcanic', 'luna100'], desc: '구름의 바다 표면에 솟은 방패 모양 화산 돔.' },
-            { id: 'V23', lunaId: 'L62', name: '륌커 산 (Mons Rümker)', lat: 40.8, lng: -58.1, diam: 70, types: ['volcanic', 'luna100'], desc: '폭풍의 대양에 있는 거대한 돔 형태의 화산 복합체.' },
-            { id: 'V24', lunaId: 'L65', name: '호르텐시우스 돔', lat: 7.6, lng: -27.9, diam: 10, types: ['volcanic', 'luna100'], desc: '호르텐시우스 크레이터 북쪽에 밀집한 화산 돔 들판.' },
-            { id: 'V25', lunaId: 'L66', name: '해들리 계곡 (Rima Hadley)', lat: 25.0, lng: 3.0, diam: 80, types: ['volcanic', 'luna100'], desc: '아폴로 15호가 탐사한 구불구불한 용암 채널.' },
-            { id: 'V26', lunaId: 'L68', name: '플램스티드 P (Flamsteed P)', lat: -3.0, lng: -44.0, diam: 112, types: ['volcanic', 'luna100'], desc: '서베이어 1호가 착륙한 거대한 고리형 화산 잔해.' },
-            { id: 'V27', lunaId: 'L71', name: '술피키우스 갈루스 흑점', lat: 19.6, lng: 11.6, diam: 12, types: ['volcanic', 'luna100'], desc: '아폴로 17호가 오렌지색 흙을 발견한 화산재 분출 지대.' },
-            { id: 'V28', lunaId: 'L72', name: '아틀라스 어두운 반점', lat: 46.7, lng: 44.4, diam: 87, types: ['volcanic', 'luna100'], desc: '크레이터 바닥에서 화산 가스가 폭발하며 만든 흔적.' },
-            { id: 'V29', lunaId: 'L77', name: '시르살리스 계곡 (Rimae Sirsalis)', lat: -15.7, lng: -61.7, diam: 425, types: ['volcanic', 'luna100'], desc: '동쪽의 바다 분지에서 방사형으로 뻗어 나온 거대 계곡.' },
-            { id: 'V30', lunaId: 'L79', name: '열기의 만 어두운 멘틀', lat: 12.0, lng: -3.5, diam: 90, types: ['volcanic', 'luna100'], desc: '화산재로 덮여 극도로 어둡게 보이는 퇴적 지역.' },
-            { id: 'V31', lunaId: 'L86', name: '프린츠 계곡 (Rimae Prinz)', lat: 27.0, lng: -43.0, diam: 46, types: ['volcanic', 'luna100'], desc: '프린츠 크레이터 인근의 복잡한 구불구불한 계곡 시스템.' },
-            { id: 'V32', lunaId: 'L89', name: '발렌타인 돔 (Valentine Dome)', lat: 30.5, lng: 10.1, diam: 30, types: ['volcanic', 'luna100'], desc: '심장 모양을 닮은 거대한 화산 돔.' },
-            { id: 'V33', lunaId: 'L91', name: '데 가스파리스 계곡 (Rimae de Gasparis)', lat: -25.9, lng: -50.7, diam: 30, types: ['volcanic', 'luna100'], desc: '수많은 단층과 계곡들이 복잡하게 교차하는 지역.' },
-            { id: 'V34', lunaId: 'L92', name: '길덴 계곡 (Vallis Gylden)', lat: -5.1, lng: 0.7, diam: 47, types: ['volcanic', 'luna100'], desc: '비의 바다 충돌 여파로 생성된 방사형 지형의 일부분.' },
-            { id: 'V35', lunaId: 'L97', name: '잉기라미 계곡 (Vallis Inghirami)', lat: -44.0, lng: -73.0, diam: 140, types: ['volcanic', 'luna100'], desc: '동쪽의 바다 분지 형성 시 날아간 분출물에 의해 파인 거대 계곡.' },
-            { id: 'V36', lunaId: 'L98', name: '비의 바다 용암류', lat: 32.8, lng: -22.0, diam: 100, types: ['volcanic', 'luna100'], desc: '비의 바다 내부에서 용암이 여러 겹으로 흐르며 만들어낸 뚜렷한 경계 무늬.' },
-            { id: 'V37', lunaId: 'L99', name: '이나 (Ina)', lat: 18.6, lng: 5.3, diam: 3, types: ['volcanic', 'luna100'], desc: '형성된 지 얼마 되지 않은(젊은) D자 모양의 화산 가스 방출 구덩이(칼데라).' },
+            { id: 'C2', name: '프톨레마이오스', lat: -9.2, lng: -1.8, diam: 153, types: ['crater'], desc: '중앙 부근 거대하고 평평한 충돌구.' },
+            { id: 'C16', lunaId: 'L5', name: '코페르니쿠스', lat: 9.7, lng: -20.1, diam: 93, types: ['crater', 'luna100'], desc: '화려한 광조를 가진 달의 군주 충돌구.' },
+            { id: 'C17', lunaId: 'L6', name: '티코', lat: -43.4, lng: -11.1, diam: 85, types: ['crater', 'luna100'], desc: '남부 고지대의 가장 눈에 띄는 젊은 광조 충돌구.' },
+            { id: 'C19', lunaId: 'L9', name: '클라비우스', lat: -58.8, lng: -14.1, diam: 225, types: ['crater', 'luna100'], desc: '고지대의 거대한 고대 충돌구.' },
+            { id: 'C20', lunaId: 'L11', name: '아리스타르쿠스', lat: 23.7, lng: -47.4, diam: 40, types: ['crater', 'luna100'], desc: '달에서 가장 밝은 충돌구.' },
+            { id: 'C73', name: '랑그레누스', lat: -8.9, lng: 61.1, diam: 127, types: ['crater'], desc: '풍요의 바다 동쪽 해안의 크고 아름다운 단구형 충돌구.' },
+            { id: 'C80', name: '피타고라스', lat: 63.5, lng: -62.8, diam: 142, types: ['crater'], desc: '달의 북서쪽 가장자리에서 보이는 가장 거대한 충돌구.' },
+            { id: 'C109', name: '아틀라스', lat: 46.7, lng: 44.4, diam: 87, types: ['crater'], desc: '북동쪽에 위치하며 다각형 테두리가 특징인 충돌구.' },
+            { id: 'C118', name: '베셀', lat: 21.8, lng: 17.9, diam: 16, types: ['crater'], desc: '맑은 바다 한가운데 위치한 눈에 띄는 충돌구.' },
             
-            // --- 루나 100 단독 (분류 지정 애매한 항목들) ---
+            // --- 화산 지형 ---
+            { id: 'V4', lunaId: 'L17', name: '슈뢰터 계곡', lat: 26.2, lng: -50.8, diam: 168, types: ['volcanic', 'luna100'], desc: '아리스타르쿠스 고원의 거대한 구불구불한 화산 계곡.' },
+            { id: 'V38', name: '버트 계곡', lat: -21.0, lng: -9.0, diam: 50, types: ['volcanic'], desc: '직선 절벽 근처 버트 크레이터 옆의 검 모양 화산 계곡.' },
+            { id: 'V41', name: '코시 계곡', lat: 10.5, lng: 38.0, diam: 140, types: ['volcanic'], desc: '코시 절벽과 평행을 이루며 달리는 거대한 선형 화산 계곡.' },
+
+            // --- 루나 100 단독 ---
             { id: 'L1', lunaId: 'L1', name: '달 (Moon)', lat: 0, lng: 0, diam: 3476, types: ['luna100'], desc: '지구의 하나뿐인 거대한 위성.' },
-            { id: 'L2', lunaId: 'L2', name: '지구조 (Earthshine)', lat: 0, lng: 0, diam: 3476, types: ['luna100'], desc: '지구에 반사된 햇빛이 비추는 달의 어두운 부분.' },
-            { id: 'L3', lunaId: 'L3', name: '바다/고지대 경계', lat: -10, lng: 10, diam: 1000, types: ['luna100'], desc: '어두운 바다와 밝은 고지대의 뚜렷한 대비.' },
-            { id: 'L41', lunaId: 'L41', name: '베셀 광조', lat: 21.8, lng: 17.9, diam: 50, types: ['luna100'], desc: '맑은 바다를 가로지르는 길고 불확실한 기원의 광조.' },
-            { id: 'L59', lunaId: 'L59', name: '쉴러-주키우스 분지', lat: -56.0, lng: -45.0, diam: 335, types: ['luna100'], desc: '심하게 침식되어 알아보기 힘든 거대한 고리 분지.' },
-            { id: 'L63', lunaId: 'L63', name: '비의 바다 조각 (Imbrium sculpture)', lat: 11.0, lng: 12.0, diam: 150, types: ['luna100'], desc: '비의 바다 충돌 시 날아간 파편이 방사형으로 깎아낸 지형.' }
+            { id: 'L2', lunaId: 'L2', name: '지구조 (Earthshine)', lat: 0, lng: 0, diam: 3476, types: ['luna100'], desc: '지구에 반사된 햇빛이 비추는 달의 어두운 부분.' }
         ];
 
-        let map2D;
-        let map3D;
-        let is3D = false;
-        let currentType = 'all'; // 초기 탭
-        let searchQuery = '';
-        let currentSort = 'type'; // 초기 정렬 상태 (분류순 최우선)
+        let map2D, map3D, is3D = false, currentType = 'all', searchQuery = '', currentSort = 'type';
+        let labelMarkers2D = [];
 
         function initMap() {
-            // --- 2D Map Initialization (Leaflet) ---
+            // --- 2D Map (확대 수준을 10으로 상향하여 약 20km 가시 범위 확보) ---
             const nasaTrekUrl = 'https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/{z}/{y}/{x}.jpg';
-
-            map2D = L.map('leaflet-map', {
-                center: [0, 0],
-                zoom: 2,
-                minZoom: 1,
-                maxZoom: 7,
-                crs: L.CRS.EPSG4326,
-                zoomSnap: 0.1,
-                zoomDelta: 0.5
+            map2D = L.map('leaflet-map', { 
+                center: [0, 0], 
+                zoom: 2, 
+                minZoom: 1, 
+                maxZoom: 10, 
+                crs: L.CRS.EPSG4326, 
+                zoomSnap: 0.1, 
+                zoomDelta: 0.5 
             });
-
-            L.tileLayer(nasaTrekUrl, {
-                attribution: 'Map data &copy; NASA Moon Trek',
-                noWrap: true,
-                tms: false,
-                maxZoom: 7
-            }).addTo(map2D);
-
+            L.tileLayer(nasaTrekUrl, { attribution: 'NASA Moon Trek', noWrap: true, maxZoom: 10 }).addTo(map2D);
             L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map2D);
 
-            map2D.on('load', () => document.getElementById('loading').classList.add('hidden'));
-            setTimeout(() => document.getElementById('loading').classList.add('hidden'), 1500);
-
-            // --- 3D Globe Initialization (Cesium) ---
+            // --- 3D Globe ---
             try {
-                // 달 전용 지형(Terrain)을 사용하여 불필요한 Web Worker 호출 방지
-                const moonTerrain = new Cesium.EllipsoidTerrainProvider({
-                    ellipsoid: Cesium.Ellipsoid.MOON
-                });
-
+                const moonTerrain = new Cesium.EllipsoidTerrainProvider({ ellipsoid: Cesium.Ellipsoid.MOON });
                 map3D = new Cesium.Viewer('cesium-container', {
-                    animation: false,
-                    baseLayerPicker: false,
-                    fullscreenButton: false,
-                    geocoder: false,
-                    homeButton: false,
-                    infoBox: false,
-                    sceneModePicker: false,
-                    selectionIndicator: false,
-                    timeline: false,
-                    navigationHelpButton: false,
-                    navigationInstructionsInitiallyVisible: false,
+                    animation: false, baseLayerPicker: false, fullscreenButton: false, geocoder: false, homeButton: false, infoBox: false, sceneModePicker: false, selectionIndicator: false, timeline: false, navigationHelpButton: false,
                     mapProjection: new Cesium.GeographicProjection(Cesium.Ellipsoid.MOON),
                     globe: new Cesium.Globe(Cesium.Ellipsoid.MOON),
                     terrainProvider: moonTerrain,
                     imageryProvider: new Cesium.UrlTemplateImageryProvider({
-                        url: 'https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/{z}/{y}/{x}.jpg',
-                        tms: false,
-                        maximumLevel: 7,
-                        tilingScheme: new Cesium.GeographicTilingScheme({
-                            ellipsoid: Cesium.Ellipsoid.MOON
-                        })
+                        url: nasaTrekUrl, tms: false, 
+                        maximumLevel: 10, // 3D 타일 상세도 상향
+                        tilingScheme: new Cesium.GeographicTilingScheme({ ellipsoid: Cesium.Ellipsoid.MOON })
                     })
                 });
-                
                 map3D.scene.skyBox.show = false;
                 map3D.scene.backgroundColor = Cesium.Color.BLACK;
-                map3D.scene.sun.show = false;
-                map3D.scene.moon.show = false; 
-            } catch (e) {
-                console.warn("Cesium 3D initialization failed, fallback to 2D only.", e);
-            }
+                
+                // 3D 클릭 로직
+                const handler = new Cesium.ScreenSpaceEventHandler(map3D.scene.canvas);
+                handler.setInputAction((click) => {
+                    const pickedObject = map3D.scene.pick(click.position);
+                    if (Cesium.defined(pickedObject) && pickedObject.id && pickedObject.id.moonFeature) {
+                        selectFeature(pickedObject.id.moonFeature, true);
+                    }
+                }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+            } catch (e) { console.warn("Cesium failed", e); }
+
+            // 줌 레벨에 따라 이름 표시 여부 결정
+            map2D.on('zoomend', function() {
+                const mapContainer = document.getElementById('leaflet-map');
+                if (map2D.getZoom() >= 5) mapContainer.classList.add('show-names');
+                else mapContainer.classList.remove('show-names');
+            });
 
             setupToggle();
+            setupMarkerToggle();
             setupNav();
             setupSearch();
             setupSort();
+            renderAllMarkers(); 
             renderList();
+
+            map2D.on('load', () => document.getElementById('loading').classList.add('hidden'));
+            setTimeout(() => document.getElementById('loading').classList.add('hidden'), 1500);
+        }
+
+        function renderAllMarkers() {
+            const isMarkerVisible = document.getElementById('marker-toggle').checked;
+            const sortedFeatures = [...moonFeatures].sort((a, b) => (b.diam || 0) - (a.diam || 0));
+
+            labelMarkers2D.forEach(m => map2D.removeLayer(m.marker));
+            labelMarkers2D = [];
+            if(map3D) map3D.entities.removeAll();
+
+            sortedFeatures.forEach(feature => {
+                if (['L1', 'L2'].includes(feature.id)) return;
+                const shortName = feature.name.split('(')[0].trim();
+
+                // --- 2D ---
+                const labelIcon = L.divIcon({
+                    className: 'feature-label-icon',
+                    html: `<div class="marker-id-container">${feature.id}</div><div class="marker-name">${shortName}</div>`,
+                    iconSize: [26, 26],
+                    iconAnchor: [13, 13]
+                });
+                const labelMarker = L.marker([feature.lat, feature.lng], { icon: labelIcon, interactive: true });
+                labelMarker.on('click', () => selectFeature(feature, true));
+                if (isMarkerVisible) labelMarker.addTo(map2D);
+                labelMarkers2D.push({ marker: labelMarker, feature: feature });
+
+                // --- 3D ---
+                if(map3D) {
+                    map3D.entities.add({
+                        id: `cesium-${feature.id}`,
+                        position: Cesium.Cartesian3.fromDegrees(feature.lng, feature.lat, 2000, Cesium.Ellipsoid.MOON),
+                        point: { pixelSize: 26, color: Cesium.Color.BLACK, outlineColor: Cesium.Color.WHITE, outlineWidth: 1.5, show: isMarkerVisible },
+                        label: { text: feature.id, font: 'bold 10px Pretendard, sans-serif', fillColor: Cesium.Color.WHITE, verticalOrigin: Cesium.VerticalOrigin.CENTER, horizontalOrigin: Cesium.HorizontalOrigin.CENTER, eyeOffset: new Cesium.Cartesian3(0, 0, -100), show: isMarkerVisible },
+                        moonFeature: feature
+                    });
+                    map3D.entities.add({
+                        id: `cesium-${feature.id}-name`,
+                        position: Cesium.Cartesian3.fromDegrees(feature.lng, feature.lat, 2000, Cesium.Ellipsoid.MOON),
+                        label: {
+                            text: shortName, font: 'bold 10px Pretendard, sans-serif', fillColor: Cesium.Color.WHITE, style: Cesium.LabelStyle.FILL_AND_OUTLINE, outlineColor: Cesium.Color.BLACK, outlineWidth: 3,
+                            verticalOrigin: Cesium.VerticalOrigin.TOP, horizontalOrigin: Cesium.HorizontalOrigin.CENTER, pixelOffset: new Cesium.Cartesian2(0, 22), eyeOffset: new Cesium.Cartesian3(0, 0, -100),
+                            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0.0, 1200000.0),
+                            show: isMarkerVisible
+                        }
+                    });
+                }
+            });
+        }
+
+        function setupMarkerToggle() {
+            const toggle = document.getElementById('marker-toggle');
+            toggle.addEventListener('change', (e) => {
+                const show = e.target.checked;
+                labelMarkers2D.forEach(item => { if (show) item.marker.addTo(map2D); else map2D.removeLayer(item.marker); });
+                if (map3D) {
+                    map3D.entities.values.forEach(entity => {
+                        if (entity.point) entity.point.show = show;
+                        if (entity.label) entity.label.show = show;
+                    });
+                }
+            });
         }
 
         function setupToggle() {
-            const btn2D = document.getElementById('btn-2d');
-            const btn3D = document.getElementById('btn-3d');
-            const body = document.body;
-
+            const btn2D = document.getElementById('btn-2d'), btn3D = document.getElementById('btn-3d'), body = document.body;
             btn2D.addEventListener('click', () => {
-                if (!is3D) return;
-                is3D = false;
-                btn2D.classList.add('active');
-                btn3D.classList.remove('active');
-                body.classList.remove('is-3d');
-                
-                if (map3D) {
-                    const center = getCesiumCenter();
-                    if (center) {
-                        map2D.setView([center.lat, center.lng], center.zoom, { animate: false });
-                    }
-                }
+                if (!is3D) return; is3D = false;
+                btn2D.classList.add('active'); btn3D.classList.remove('active'); body.classList.remove('is-3d');
+                if (map3D) { const c = getCesiumCenter(); if (c) map2D.setView([c.lat, c.lng], c.zoom, { animate: false }); }
             });
-
             btn3D.addEventListener('click', () => {
-                if (is3D) return;
-                is3D = true;
-                btn3D.classList.add('active');
-                btn2D.classList.remove('active');
-                body.classList.add('is-3d');
-
-                if (map3D) {
-                    const center = map2D.getCenter();
-                    const zoom = map2D.getZoom();
-                    // 애니메이션 없이 즉각적으로 시점을 맞춰 카메라 오동작 방지
-                    flyTo3D(center.lat, center.lng, zoom, true); 
-                }
+                if (is3D) return; is3D = true;
+                btn3D.classList.add('active'); btn2D.classList.remove('active'); body.classList.add('is-3d');
+                if (map3D) { const c = map2D.getCenter(); flyTo3D(c.lat, c.lng, map2D.getZoom(), true); }
             });
         }
-        
+
         function getCesiumCenter() {
             if (!map3D) return null;
-            const windowPosition = new Cesium.Cartesian2(map3D.canvas.clientWidth / 2, map3D.canvas.clientHeight / 2);
-            const pickRay = map3D.camera.getPickRay(windowPosition);
-            const globe = map3D.scene.globe;
-            const pickPosition = globe.pick(pickRay, map3D.scene);
-            
-            let lat = 0, lng = 0;
-            if (pickPosition) {
-                const cartographic = globe.ellipsoid.cartesianToCartographic(pickPosition);
-                lat = Cesium.Math.toDegrees(cartographic.latitude);
-                lng = Cesium.Math.toDegrees(cartographic.longitude);
-            } else {
-                // pickPosition이 안 잡힐 경우(줌아웃 상태 등) 카메라 중심 좌표를 폴백으로 사용
-                const cartographic = map3D.camera.positionCartographic;
-                lat = Cesium.Math.toDegrees(cartographic.latitude);
-                lng = Cesium.Math.toDegrees(cartographic.longitude);
-            }
-
-            const height = map3D.camera.positionCartographic.height;
-            const zoom = Math.max(1.8, 10 - Math.log2(height / 10000));
-            
-            return { lat, lng, zoom };
+            const cartographic = map3D.camera.positionCartographic;
+            return { lat: Cesium.Math.toDegrees(cartographic.latitude), lng: Cesium.Math.toDegrees(cartographic.longitude), zoom: Math.max(1.8, 10 - Math.log2(cartographic.height / 10000)) };
         }
 
-        // instant=true 일 때는 애니메이션 없이 즉각적으로 시점을 맞춤
-        function flyTo3D(lat, lng, zoomLevel, instant = false) {
+        function flyTo3D(lat, lng, zoom, instant = false) {
             if (!map3D) return;
-            
-            const height = 10000 * Math.pow(2, 10 - zoomLevel);
+            const height = 10000 * Math.pow(2, 10 - zoom);
             const destination = Cesium.Cartesian3.fromDegrees(lng, lat, height, Cesium.Ellipsoid.MOON);
-            const orientation = {
-                heading: 0.0,
-                pitch: Cesium.Math.toRadians(-90.0), // 항상 똑바로 아래를 내려다보도록 강제 지정
-                roll: 0.0
-            };
-
-            if (instant) {
-                map3D.camera.setView({ destination, orientation });
-            } else {
-                map3D.camera.flyTo({
-                    destination,
-                    orientation,
-                    duration: 1.5
-                });
-            }
-        }
-
-        function setupSort() {
-            const sortSelect = document.getElementById('sort-select');
-            sortSelect.value = 'type';
-            sortSelect.addEventListener('change', (e) => {
-                currentSort = e.target.value;
-                renderList();
-            });
+            const orientation = { heading: 0, pitch: Cesium.Math.toRadians(-90), roll: 0 };
+            if (instant) map3D.camera.setView({ destination, orientation });
+            else map3D.camera.flyTo({ destination, orientation, duration: 1.5 });
         }
 
         function setupNav() {
-            // "홈" 버튼 로직 (모든 설정 초기화)
-            const homeBtn = document.getElementById('btn-home');
-            const btns = document.querySelectorAll('.nav-btn[data-type]');
+            const homeBtn = document.getElementById('btn-home'), btns = document.querySelectorAll('.nav-btn[data-type]');
+            const counts = {
+                all: moonFeatures.length, sea: moonFeatures.filter(f => f.types.includes('sea')).length, mountain: moonFeatures.filter(f => f.types.includes('mountain')).length,
+                crater: moonFeatures.filter(f => f.types.includes('crater')).length, volcanic: moonFeatures.filter(f => f.types.includes('volcanic')).length, luna100: moonFeatures.filter(f => f.lunaId).length
+            };
+            btns.forEach(btn => { const type = btn.getAttribute('data-type'); const countSpan = btn.querySelector('.count'); if (countSpan) countSpan.textContent = `(${counts[type]})`; });
+
+            const reset = () => {
+                currentType = 'all'; searchQuery = ''; currentSort = 'type';
+                document.getElementById('search-input').value = ''; document.getElementById('sort-select').value = 'type';
+                btns.forEach(b => b.classList.toggle('active', b.getAttribute('data-type') === 'all'));
+                renderList();
+                if (is3D) flyTo3D(0, 0, 2); else map2D.flyTo([0, 0], 2, { duration: 1.5 });
+            };
+            if (homeBtn) homeBtn.addEventListener('click', reset);
             
-            if (homeBtn) {
-                homeBtn.addEventListener('click', () => {
-                    // 상태 초기화
-                    currentType = 'all';
-                    searchQuery = '';
-                    currentSort = 'type';
-                    
-                    // UI 인풋 및 선택박스 초기화
-                    const searchInput = document.getElementById('search-input');
-                    if (searchInput) searchInput.value = '';
-                    
-                    const sortSelect = document.getElementById('sort-select');
-                    if (sortSelect) sortSelect.value = 'type';
-                    
-                    const sortControls = document.getElementById('sort-controls');
-                    if (sortControls) sortControls.style.display = 'flex';
-
-                    // 탭 버튼 UI 상태 갱신
-                    btns.forEach(b => b.classList.remove('active'));
-                    const allBtn = document.querySelector('.nav-btn[data-type="all"]');
-                    if (allBtn) allBtn.classList.add('active');
-
-                    // 리스트 렌더링
-                    renderList();
-
-                    // 지도 전체 보기로 부드럽게 초기화
-                    if (is3D) {
-                        flyTo3D(0, 0, 2);
-                    } else {
-                        map2D.flyTo([0, 0], 2, { animate: true, duration: 1.5 });
-                    }
-                });
-            }
-
-            // 일반 카테고리 탭 로직
-            btns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    btns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentType = btn.getAttribute('data-type');
-                    
-                    searchQuery = '';
-                    const searchInput = document.getElementById('search-input');
-                    if(searchInput) searchInput.value = '';
-
-                    if (currentType !== 'luna100') {
-                        currentSort = 'type';
-                        const sortSelect = document.getElementById('sort-select');
-                        if(sortSelect) sortSelect.value = 'type';
-                    }
-
-                    const sortControls = document.getElementById('sort-controls');
-                    if (currentType === 'luna100') {
-                        sortControls.style.display = 'none';
-                    } else {
-                        sortControls.style.display = 'flex';
-                    }
-
-                    renderList();
-
-                    if (is3D) {
-                        flyTo3D(0, 0, 2);
-                    } else {
-                        map2D.flyTo([0, 0], 2, { animate: true, duration: 1.5 });
-                    }
-                });
-            });
+            btns.forEach(btn => btn.addEventListener('click', () => {
+                btns.forEach(b => b.classList.remove('active')); btn.classList.add('active');
+                currentType = btn.getAttribute('data-type'); searchQuery = '';
+                document.getElementById('search-input').value = '';
+                if (currentType !== 'luna100') { currentSort = 'type'; document.getElementById('sort-select').value = 'type'; }
+                renderList();
+            }));
         }
 
         function setupSearch() {
-            const searchBtn = document.getElementById('search-btn');
-            const searchInput = document.getElementById('search-input');
-
-            if (!searchBtn || !searchInput) return;
-
-            const performSearch = () => {
-                searchQuery = searchInput.value.toLowerCase().trim();
-                renderList();
-            };
-
-            searchBtn.addEventListener('click', performSearch);
-            searchInput.addEventListener('keyup', (e) => {
-                if (e.key === 'Enter') performSearch();
-            });
+            const btn = document.getElementById('search-btn'), input = document.getElementById('search-input');
+            const search = () => { searchQuery = input.value.toLowerCase().trim(); renderList(); };
+            btn.addEventListener('click', search);
+            input.addEventListener('keyup', (e) => { if (e.key === 'Enter') search(); });
         }
+
+        function setupSort() { document.getElementById('sort-select').addEventListener('change', (e) => { currentSort = e.target.value; renderList(); }); }
 
         function renderList() {
             const listContainer = document.getElementById('feature-list');
             listContainer.innerHTML = '';
+            let filtered = moonFeatures.filter(f => (currentType === 'luna100' ? f.lunaId : (currentType === 'all' || f.types.includes(currentType))));
+            if (searchQuery) filtered = filtered.filter(f => f.name.toLowerCase().includes(searchQuery));
 
-            let filtered;
-            if (currentType === 'luna100') {
-                filtered = moonFeatures.filter(f => f.lunaId);
-            } else if (currentType === 'all') {
-                filtered = [...moonFeatures];
-            } else {
-                filtered = moonFeatures.filter(f => f.types.includes(currentType));
-            }
-            
-            if (searchQuery) {
-                filtered = filtered.filter(f => f.name.toLowerCase().includes(searchQuery));
-            }
+            if(currentType === 'luna100') filtered.sort((a, b) => (parseInt(a.lunaId.replace('L', '')) || 0) - (parseInt(b.lunaId.replace('L', '')) || 0));
+            else if (currentSort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+            else filtered.sort((a, b) => {
+                const typeA = a.id.replace(/[0-9]/g, ''), typeB = b.id.replace(/[0-9]/g, '');
+                if(typeA !== typeB) return typeA.localeCompare(typeB);
+                return (parseInt(a.id.replace(/[^0-9]/g, '')) || 0) - (parseInt(b.id.replace(/[^0-9]/g, '')) || 0);
+            });
 
-            if(currentType === 'luna100') {
-                filtered.sort((a, b) => {
-                    const numA = parseInt(a.lunaId.replace('L', '')) || 0;
-                    const numB = parseInt(b.lunaId.replace('L', '')) || 0;
-                    return numA - numB;
-                });
-            } else {
-                if (currentSort === 'name') {
-                    filtered.sort((a, b) => a.name.localeCompare(b.name));
-                } else if (currentSort === 'type') {
-                    filtered.sort((a, b) => {
-                        const typeA = a.id.replace(/[0-9]/g, '');
-                        const typeB = b.id.replace(/[0-9]/g, '');
-                        if(typeA !== typeB) return typeA.localeCompare(typeB);
-                        
-                        const numA = parseInt(a.id.replace(/[^0-9]/g, '')) || 0;
-                        const numB = parseInt(b.id.replace(/[^0-9]/g, '')) || 0;
-                        return numA - numB;
-                    });
-                }
-            }
-
-            if (filtered.length === 0) {
-                listContainer.innerHTML = '<div style="padding: 20px; color: #94a3b8; text-align: center;">검색 결과가 없습니다.</div>';
-                return;
-            }
-
+            if (filtered.length === 0) { listContainer.innerHTML = '<div style="padding: 20px; color: #94a3b8; text-align: center;">결과 없음</div>'; return; }
             filtered.forEach(feature => {
                 const item = document.createElement('div');
                 item.className = 'feature-item';
                 item.id = `item-${feature.id}`;
-                
-                let displayId = '';
-                if (currentType === 'luna100') {
-                    displayId = feature.lunaId;
-                } else {
-                    displayId = feature.id;
-                    if (feature.lunaId && feature.id !== feature.lunaId) {
-                        displayId += ` / ${feature.lunaId}`;
-                    }
-                }
-                
-                item.innerHTML = `
-                    <span class="feature-id">${displayId}</span>
-                    <div class="feature-name">${feature.name}</div>
-                    <div class="feature-desc">${feature.desc}</div>
-                `;
-
-                item.addEventListener('click', () => selectFeature(feature));
+                let displayId = (currentType === 'luna100') ? feature.lunaId : (feature.lunaId && feature.id !== feature.lunaId ? `${feature.id} / ${feature.lunaId}` : feature.id);
+                item.innerHTML = `<span class="feature-id">${displayId}</span><div class="feature-name">${feature.name}</div><div class="feature-desc">${feature.desc}</div>`;
+                item.addEventListener('click', () => selectFeature(feature, true));
                 listContainer.appendChild(item);
             });
         }
 
-        function selectFeature(feature) {
-            document.querySelectorAll('.feature-item').forEach(el => el.classList.remove('active'));
-            const element = document.getElementById(`item-${feature.id}`);
-            if (element) element.classList.add('active');
-
-            let targetZoom = 5.0;
-            if (feature.diam) {
-                const calculatedZoom = 13.0 - Math.log2(feature.diam);
-                targetZoom = Math.max(1.8, Math.min(calculatedZoom, 7.0));
+        function selectFeature(feature, updateMap = false) {
+            let element = document.getElementById(`item-${feature.id}`);
+            if (!element && updateMap) {
+                currentType = 'all'; searchQuery = ''; renderList();
+                element = document.getElementById(`item-${feature.id}`);
             }
+            document.querySelectorAll('.feature-item').forEach(el => el.classList.remove('active'));
+            if (element) { element.classList.add('active'); element.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 
-            if (is3D) {
-                flyTo3D(feature.lat, feature.lng, targetZoom);
-            } else {
-                map2D.flyTo([feature.lat, feature.lng], targetZoom, {
-                    animate: true,
-                    duration: 1.5
-                });
+            if (updateMap) {
+                let targetZoom = 5.0;
+                if (feature.diam) targetZoom = Math.max(1.8, Math.min(13.0 - Math.log2(feature.diam), 10.0));
+                if (is3D) flyTo3D(feature.lat, feature.lng, targetZoom);
+                else map2D.flyTo([feature.lat, feature.lng], targetZoom, { animate: true, duration: 1.5 });
             }
         }
-
         document.addEventListener('DOMContentLoaded', initMap);
     </script>
 </body>
